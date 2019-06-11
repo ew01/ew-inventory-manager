@@ -25,7 +25,8 @@ $ewim_aLedgerRecords= $wpdb->get_results("SELECT * FROM $ewim_tables->ewim_ledge
 
 foreach($ewim_aLedgerRecords as &$ewim_aLedgerRecord){
 
-	$ewim_totalDifference= $ewim_totalDifference + $ewim_aLedgerRecord['difference'];
+	/** @noinspection PhpWrongStringConcatenationInspection */
+	$ewim_totalDifference = $ewim_totalDifference + $ewim_aLedgerRecord['difference'];
 
 	$ewim_itemID= $ewim_aLedgerRecord['item_id'];
 	$ewim_aItem= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_items WHERE id = $ewim_itemID",ARRAY_A);
@@ -43,16 +44,6 @@ $ewim_totalDifference= number_format($ewim_totalDifference,2,'.',',');
 
 $ewim_jsonData= json_encode($ewim_aLedgerRecords);//Encode to json
 
-//Debug Setting
-$ewim_gamesDebug= 0;
-if($ewim_gamesDebug == 1){
-	echo "<h1>Games Array</h1>";
-	echo "<pre>";
-	print_r($ewim_aLedger);
-	echo "</pre>";
-	exit;
-}
-//endregion
 
 //Start Task 2: Angular Set Up
 //$ewim_defaultOrderBy= 'id';

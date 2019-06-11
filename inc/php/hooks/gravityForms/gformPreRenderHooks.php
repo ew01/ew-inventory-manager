@@ -7,7 +7,7 @@
  * Name: Form Populate Hooks
  * Desc: The hooks here will populate Gravity Forms with data from the WP DB
  */
-
+/** @noinspection PhpUndefinedVariableInspection */
 
 
 
@@ -33,7 +33,7 @@ function ewim_gf_populate_lists($ewim_oForm){
 	$ewim_current_user= wp_get_current_user();
 	$ewim_userID= $ewim_current_user->ID;
 	$ewim_debug_settings= new ewim_debug_settings();
-	$ewim_activeGameID= get_user_meta($ewim_userID, 'active_game', true);
+	//$ewim_activeGameID= get_user_meta($ewim_userID, 'active_game', true);
 	$ewim_activeGameSystem= get_user_meta($ewim_userID, 'active_game_system', true);
 	//endregion
 
@@ -208,9 +208,10 @@ function create_input_fields($ewim_oForm){
 						if($ewim_oField->adminLabel == 'radio_template'){
 							$ewim_oRadioFieldTemplate= clone $ewim_oField;
 						}
-						if($ewim_oField->adminLabel == 'number_template'){
+						//todo this may get used for recipe amounts
+						/*if($ewim_oField->adminLabel == 'number_template'){
 							$ewim_oNumberFieldTemplate= clone $ewim_oField;
-						}
+						}*/
 						if($ewim_oField->type == 'section'){
 							$ewim_oSectionFieldTemplate= $ewim_oField;
 						}
@@ -524,12 +525,6 @@ function create_input_fields($ewim_oForm){
 
 					$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewField;//Push our new field object into the form object
 
-					//Increase our counters, alternate our strings
-					$ewim_fieldCount++;
-					$ewim_itemCount++;
-					$ewim_fieldID++;
-					//endregion
-
 					//endregion
 
 					//region Component Category
@@ -571,9 +566,11 @@ function create_input_fields($ewim_oForm){
 				if($ewim_oField->adminLabel == 'drop_down_template'){
 					$ewim_oDropDownFieldTemplate= clone $ewim_oField;
 				}
+				/*
 				if($ewim_oField->adminLabel == 'action'){
 					$ewim_actionFieldID= $ewim_oField->id;
 				}
+				*/
 				if($ewim_oField->type == 'section'){
 					$ewim_oSectionFieldTemplate= $ewim_oField;
 				}
@@ -1307,12 +1304,14 @@ function create_input_fields($ewim_oForm){
 				if($ewim_oField->adminLabel == 'drop_down_template'){
 					$ewim_oDropDownFieldTemplate= clone $ewim_oField;
 				}
+				/*
 				if($ewim_oField->adminLabel == 'action'){
 					$ewim_actionFieldID= $ewim_oField->id;
 				}
 				if($ewim_oField->type == 'section'){
 					$ewim_oSectionFieldTemplate= $ewim_oField;
 				}
+				*/
 				$ewim_fieldCount++;
 			}
 			//endregion
@@ -1403,6 +1402,7 @@ function create_input_fields($ewim_oForm){
 					$ewim_aCoinage= array(
 						'ISK'
 					);
+					/** @noinspection PhpUnusedLocalVariableInspection */
 					foreach($ewim_aCoinage as $ewim_coin){
 						$ewim_oNewField= clone $ewim_oNumberFieldTemplate;
 						$ewim_oNewField->label= "Taxes Paid";
@@ -1473,8 +1473,15 @@ function item_related_form_pre_render($ewim_oForm){
 /**
  * Name: Item Related Form Populate Field Values
  * Desc: Called by the Item Related Form Pre Render. Will populate the fields that have dynamic enabled with the corresponding field from the database. Must have item id in post or request
+ *
+ * @param $value
+ * @param $field
+ * @param $name
+ *
+ * @return mixed
  */
-function item_related_form_populate_field_values( $value, $field, $name ) {
+
+function item_related_form_populate_field_values( $value, /** @noinspection PhpUnusedParameterInspection */$field, $name ) {
 	//region Global Variables, Local Variables, Classes
 	global $wpdb;
 	$ewim_tables= new ewim_tables();
@@ -1482,9 +1489,8 @@ function item_related_form_populate_field_values( $value, $field, $name ) {
 	$ewim_aValues= array();
 	$ewim_itemID= $_REQUEST['record_id'];
 
-	$ewim_current_user= wp_get_current_user();
 	$ewim_userID= $ewim_current_user->ID;
-	$ewim_debug_settings= new ewim_debug_settings();
+	//$ewim_debug_settings= new ewim_debug_settings();
 	$ewim_activeGameID= get_user_meta($ewim_userID, 'active_game', true);
 	//endregion
 

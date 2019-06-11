@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpStatementHasEmptyBodyInspection */
 /**
  * Created by PhpStorm.
  * Author: David
@@ -13,6 +13,9 @@
 
 
 //region Insert Data
+/**
+ * @param $ewim_dbDataVersion
+ */
 function ewim_insert_data_v_two($ewim_dbDataVersion){
 	//Global Variables and Classes
 	global $wpdb;
@@ -115,9 +118,9 @@ function ewim_insert_data_v_two($ewim_dbDataVersion){
 function ewim_insert_data_v_two_check() {
 	$ewim_dbDataVersion = '1.0.5';//db.table.field
 	if ( get_option( 'ewim_db_data_version' ) != $ewim_dbDataVersion ) {
-		ewim_insert_data_v_two($ewim_dbDataVersion);
+//		ewim_insert_data_v_two($ewim_dbDataVersion);
 	}
 }
 //Run the db update check
-add_action( 'plugins_loaded', 'ewim_insert_data_v_two_check' );
+//add_action( 'plugins_loaded', 'ewim_insert_data_v_two_check' );
 //endregion

@@ -7,11 +7,11 @@
  * Name:
  * Desc:
  */
+/** @noinspection PhpUndefinedVariableInspection */
 
 
 
 
-//$ewim_defaultOrderBy
 ?>
 <script>
     angular.module('<?= ($ewim_angularApp != '' ? $ewim_angularApp : 'listApp'); ?>', ['ui.bootstrap'])

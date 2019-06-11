@@ -7,8 +7,8 @@
  * Name:
  * Desc:
  */
-
-
+/** @noinspection PhpUnusedLocalVariableInspection */
+/** @noinspection PhpStatementHasEmptyBodyInspection */
 
 
 
@@ -25,7 +25,7 @@ add_action("gform_pre_submission", 'ewim_master_pre_submission' );
 function ewim_master_pre_submission($ewim_oForm){
 	//region Classes, Global Variables, Local Variables
 	$ewim_tables= new ewim_tables();
-	$ewim_get_options= new ewim_get_options();
+	//$ewim_get_options= new ewim_get_options();
 	$ewim_debug_settings= new ewim_debug_settings();
 	$ewim_current_user= wp_get_current_user();
 	$ewim_userID= $ewim_current_user->ID;
@@ -53,6 +53,15 @@ function ewim_master_pre_submission($ewim_oForm){
 	//region Step 2: Choose the Processor
 	switch ($ewim_formProcessor){
 		case "default":
+			//region Initial Variable Declaration
+			$ewim_aItemMeta['BPO']= '';
+			$ewim_aInputFields= array();
+			$ewim_aIngredients= array();
+			$ewim_recordID= 0;
+			$ewim_recordIDFieldID= 0;
+			$ewim_editTableName= '';
+			$ewim_aInsert= array();
+			//endregion
 			//region Default Step 1: Loop the Fields
 			foreach($ewim_oForm['fields'] as $ewim_aField){
 				switch ($ewim_aField['type']){
@@ -129,10 +138,11 @@ function ewim_master_pre_submission($ewim_oForm){
 				$ewim_aItemMeta['Product']= $ewim_bpoMeta['Product'];
 			}
 			//endregion
-			if($ewim_aInputFields != ''){
+			if(!empty($ewim_aInputFields)){
 				$ewim_aInsert['input_fields']= json_encode($ewim_aInputFields);
 			}
-			if($ewim_aIngredients != ''){
+
+			if(!empty($ewim_aIngredients)){
 				$ewim_aInsert['item_recipe_ingredients']= json_encode($ewim_aIngredients);
 			}
 
@@ -143,8 +153,9 @@ function ewim_master_pre_submission($ewim_oForm){
 			//endregion
 
 			//region Default Step 3: Call the SQL Edit Function, check for errors
-			$ewim_action= ($ewim_recordID == 0 ? 'insert' : 'update');
-			$ewim_aEditResult= ewim_wpdb_edit($ewim_action,$ewim_editTableName,$ewim_aInsert,$ewim_recordID);
+			/** @noinspection PhpUndefinedVariableInspection */
+			$ewim_action      = ( $ewim_recordID == 0 ? 'insert' : 'update');
+			$ewim_aEditResult = ewim_wpdb_edit($ewim_action,$ewim_editTableName,$ewim_aInsert,$ewim_recordID);
 			if($ewim_aEditResult['error'] == 'Error'){
 				//todo echo friendly error
 				if($ewim_debug_settings->ewim_wpdbEdit == 1){
@@ -171,6 +182,38 @@ function ewim_master_pre_submission($ewim_oForm){
 
 			break;//End Default Processor
 		case "item_transaction":
+			//region Initialize Variables
+			$ewim_recordID= 0;
+			$ewim_action= '';
+			$ewim_editTableName= '';
+			//endregion
+
+			//region General Dynamic Variable Declarations
+			$amount_Sell= 0;
+			$amount_Buy= 0;
+			$amount_Harvest= 0;
+			//endregion
+
+			//region DnD Dynamic Variable Declarations
+			$Silver= 0;
+			$Gold= 0;
+			$Copper= 0;
+			$amount_Craft= 0;
+			//endregion
+
+			//region EVE Dynamic Variable Declarations
+			$ISK= 0;
+			$broker_fee= 0;
+			$sales_tax= 0;
+			$amount_Process= 0;
+			$amount_Manufacture= 0;
+			$manufacturing_cost= 0;
+			$amount_Copy= 0;
+			$copy_cost= 0;
+			$amount_Post= 0;
+			$posted_price= 0;
+			//endregion
+
 			//region Item Transaction Step 1: Loop the Fields, Assign to Variables
 			foreach($ewim_oForm['fields'] as $ewim_aField){
 				switch ($ewim_aField['type']){
@@ -183,7 +226,7 @@ function ewim_master_pre_submission($ewim_oForm){
 								break;
 							case "record_id":
 								$ewim_recordID= $_POST['input_'.$ewim_aField['id']];
-								$ewim_recordIDFieldID= $ewim_aField['id'];
+								//$ewim_recordIDFieldID= $ewim_aField['id'];
 								break;
 							default:
 								$ewim_aInsert[$ewim_aField['label']]= $_POST['input_'.$ewim_aField['id']];
@@ -310,7 +353,7 @@ function ewim_master_pre_submission($ewim_oForm){
 								}
 							}
 							else{
-								$ewim_successMessage= '';
+								//$ewim_successMessage= '';
 							}
 
 							break;
@@ -323,8 +366,6 @@ function ewim_master_pre_submission($ewim_oForm){
 
 								$ewim_aIngredientItemNameID= explode("_",$ewim_ingredientNameID);
 								$ewim_ingredientID= $ewim_aIngredientItemNameID[1];
-
-
 
 								$ewim_aIngredientItem= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_items WHERE id = $ewim_ingredientID",ARRAY_A);
 								$ewim_craftingCost= $ewim_craftingCost + ($ewim_aIngredientItem['cost'] * $ewim_ingredientAmount);
@@ -347,9 +388,8 @@ function ewim_master_pre_submission($ewim_oForm){
 									}
 								}
 								else{
-									$ewim_successMessage= '';
+									//$ewim_successMessage= '';
 								}
-
 							}
 
 							//Add Crafted Amount
@@ -378,7 +418,7 @@ function ewim_master_pre_submission($ewim_oForm){
 								}
 							}
 							else{
-								$ewim_successMessage= '';
+								//$ewim_successMessage= '';
 							}
 
 							break;
@@ -575,6 +615,9 @@ function ewim_master_pre_submission($ewim_oForm){
 
 							break;
 						case "Manufacture":
+							//region Initial Variable Declaration
+							$ewim_bpcTotalRunCost= 0;
+							//endregion
 							$ewim_amountManufactured= $amount_Manufacture;
 							$ewim_manufacturingStationCost= $ewim_manufacturingCost= $manufacturing_cost;
 
@@ -695,6 +738,10 @@ function ewim_master_pre_submission($ewim_oForm){
 							//endregion
 							break;
 						case "Copy":
+							//region Initialize Variables
+							$ewim_aBPC= array();
+							$ewim_bpcID= 0;
+							//endregion
 							$ewim_amountCopy= $amount_Copy;
 							$ewim_copyCost= $copy_cost;
 
@@ -862,6 +909,15 @@ function ewim_master_pre_submission($ewim_oForm){
 						break;
 			break;
 		case "sell_posted":
+
+			//region General Dynamic Variable Declarations
+			$amount_Sell= 0;
+			$taxes_paid= 0;
+			$amount_Remove= 0;
+			$ewim_action= '';
+			$ewim_recordID= 0;
+			//endregion
+
 			//region Sell Posted Step 1: Loop the Fields, Assign to Variables
 			foreach($ewim_oForm['fields'] as $ewim_aField){
 				switch ($ewim_aField['type']){
@@ -870,11 +926,11 @@ function ewim_master_pre_submission($ewim_oForm){
 							case "processor":
 								break;
 							case "table":
-								$ewim_editTableName= $ewim_tables->$_POST['input_'.$ewim_aField['id']];
+								//$ewim_editTableName= $ewim_tables->$_POST['input_'.$ewim_aField['id']];
 								break;
 							case "record_id":
 								$ewim_recordID= $_POST['input_'.$ewim_aField['id']];
-								$ewim_recordIDFieldID= $ewim_aField['id'];
+								//$ewim_recordIDFieldID= $ewim_aField['id'];
 								break;
 							default:
 								$ewim_aInsert[$ewim_aField['label']]= $_POST['input_'.$ewim_aField['id']];

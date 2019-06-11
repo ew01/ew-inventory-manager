@@ -8,6 +8,20 @@
  * Desc:
  */
 
+/**
+ * Class ewim_get_options
+ *
+ * @property mixed|void ewim_postPage
+ * @property mixed|void ewim_gameFormPage
+ * @property mixed|void ewim_itemPage
+ * @property mixed|void ewim_itemFormPage
+ * @property mixed|void ewim_itemListPage
+ * @property mixed|void ewim_gameFormID
+ * @property mixed|void ewim_acquireFormID
+ * @property mixed|void ewim_itemFormID
+ */
+
+
 class ewim_get_options {
 	public function __construct() {
 		$this->ewim_itemFormID= get_option('ewim_itemFormID');

@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpStatementHasEmptyBodyInspection */
 /**
  * Created by PhpStorm.
  * Author: David
@@ -17,7 +17,11 @@
  * Desc: Runs on update of plugin
  * $ewim_dbVersion string
  */
-//region EWIM Install Database 2.0.0
+
+/**
+ * Name: EWIM Install Database 2.0.0
+ * @param $ewim_dbVersion
+ */
 function ewim_install_database_v_two($ewim_dbVersion){
 	//region Global Variables, Local Variables, Classes
 	global $wpdb;
@@ -114,15 +118,15 @@ function ewim_install_database_v_two($ewim_dbVersion){
 
 	//update_option( 'ewim_db_version', $ewim_dbVersion );
 }
-//endregion
+
 
 //region Calls install if db version has changed.
 function ewim_update_db_check_v_two() {
 	$ewim_dbVersion = '1.0.5';//db.table.field
 	if ( get_option( 'ewim_db_version' ) < $ewim_dbVersion ) {
-		ewim_install_database_v_two($ewim_dbVersion);
+		//ewim_install_database_v_two($ewim_dbVersion);
 	}
 }
 //Run the db update check
-add_action( 'plugins_loaded', 'ewim_update_db_check_v_two' );
+//add_action( 'plugins_loaded', 'ewim_update_db_check_v_two' );
 //endregion

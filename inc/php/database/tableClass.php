@@ -8,10 +8,14 @@
  * Desc:
  */
 
-
-
-
-
+/**
+ * Class ewim_tables
+ * @property string ewim_posted
+ * @property string ewim_meta_data
+ * @property string ewim_ledger
+ * @property string ewim_items
+ * @property string ewim_games
+ */
 class ewim_tables{
 	public function __construct() {
 		global $wpdb;
