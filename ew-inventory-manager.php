@@ -9,8 +9,8 @@
  * License: 
  */
 
-//todo: add ability to make a transaction that may not involve users items
-//todo: add a consume item action, should not have a negative balance since item is in inventory.
+
+
 
 //region Includes
 include_once ( __DIR__ . "/inc/inc.php" );
@@ -82,18 +82,6 @@ function ewim_page($ewim_parameters){
 		//region Get Page path from Shortcode
 		$ewim_pagePath= (isset($ewim_parameters['page']) ? $ewim_parameters['page'] : 'gameList');
 
-		/*
-		if(isset($pkc_parameters['module'])){
-			//$ewim_module= $ewim_parameters['module'];
-			//Page Path
-			$ewim_pagePath= (isset($ewim_parameters['page']) ? $ewim_parameters['page'] : 'gameList');
-			//Display Mode
-		}
-		else{
-			//$ewim_module= 'game';
-			$ewim_pagePath= 'gameList';
-		}
-		*/
 		//endregion
 
 		//region Include the requested page
@@ -117,22 +105,6 @@ add_shortcode( 'ewim', 'ewim_page');
 //region Redirect Based on User Role
 function login_redirect( /** @noinspection PhpUnusedParameterInspection */	$redirect_to, $request, $user ) {
 	return home_url();
-	/*
-	//is there a user to check?
-	global $user;
-	if ( isset( $user->roles ) && is_array( $user->roles ) ) {
-		//check for admins
-		if ( in_array( 'administrator', $user->roles ) ) {
-			// redirect them to the default place
-			return $redirect_to;
-		} else {
-			return home_url()."/shop";
-		}
-	}
-	else {
-		return $redirect_to;
-	}
-	*/
 }
 //Add Redirect Filter
 add_filter( 'login_redirect', 'login_redirect', 10, 3 );

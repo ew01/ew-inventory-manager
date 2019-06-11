@@ -7,8 +7,8 @@
  * Name:
  * Desc:
  */
-//todo create a error log table to submit to
-//todo error logging table, and friendly message
+
+
 
 
 

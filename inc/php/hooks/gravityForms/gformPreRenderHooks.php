@@ -208,10 +208,6 @@ function create_input_fields($ewim_oForm){
 						if($ewim_oField->adminLabel == 'radio_template'){
 							$ewim_oRadioFieldTemplate= clone $ewim_oField;
 						}
-						//todo this may get used for recipe amounts
-						/*if($ewim_oField->adminLabel == 'number_template'){
-							$ewim_oNumberFieldTemplate= clone $ewim_oField;
-						}*/
 						if($ewim_oField->type == 'section'){
 							$ewim_oSectionFieldTemplate= $ewim_oField;
 						}
@@ -549,10 +545,6 @@ function create_input_fields($ewim_oForm){
 			$ewim_fieldID= 1000;//Sets the Starting Field ID for New fields
 			//endregion
 
-			//todo consume action
-			//todo percentage for sells
-			//todo posting option, fee field, figure way to calculate fee when item sales, new table field?
-
 			//region Item Adjust Form Step 1: Get the game system
 			$ewim_aGame= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_games WHERE id = $ewim_activeGameID",ARRAY_A);
 			//endregion
@@ -566,11 +558,6 @@ function create_input_fields($ewim_oForm){
 				if($ewim_oField->adminLabel == 'drop_down_template'){
 					$ewim_oDropDownFieldTemplate= clone $ewim_oField;
 				}
-				/*
-				if($ewim_oField->adminLabel == 'action'){
-					$ewim_actionFieldID= $ewim_oField->id;
-				}
-				*/
 				if($ewim_oField->type == 'section'){
 					$ewim_oSectionFieldTemplate= $ewim_oField;
 				}
@@ -1304,14 +1291,6 @@ function create_input_fields($ewim_oForm){
 				if($ewim_oField->adminLabel == 'drop_down_template'){
 					$ewim_oDropDownFieldTemplate= clone $ewim_oField;
 				}
-				/*
-				if($ewim_oField->adminLabel == 'action'){
-					$ewim_actionFieldID= $ewim_oField->id;
-				}
-				if($ewim_oField->type == 'section'){
-					$ewim_oSectionFieldTemplate= $ewim_oField;
-				}
-				*/
 				$ewim_fieldCount++;
 			}
 			//endregion
@@ -1539,40 +1518,5 @@ function item_related_form_populate_field_values( $value, /** @noinspection PhpU
 	}
 	//endregion
 
-	//$ewim_aValues['Gleaming Spodumain_39']= 'Yes';
-
 	return isset( $ewim_aValues[ $name ] ) ? $ewim_aValues[ $name ] : $value;
 }
-
-/*
- * Name: This is a good way to populate fields, I have a more efficient method currently, but this could come in handy
- * todo, move to a scrap project before launching version 2.0
- * https://resoundingechoes.net/development/gravity-forms-how-to-pre-populate-fields/
-foreach($ewim_oForm['fields'] as $ewim_aFields){
-	$ewim_fieldName= ($ewim_aFields['type'] != 'hidden' ? $ewim_aFields['adminLabel'] : $ewim_aFields['label']);
-
-	//	add_filter("gform_field_value_$ewim_fieldName", "ewim_return_value");
-}
-function ewim_return_value($ewim_value){
-	//region Global Variables, Local Variables, Classes
-	global $wpdb;
-	$ewim_tables= new ewim_tables();
-	$ewim_current_user= wp_get_current_user();
-	$ewim_aValues= array();
-	$ewim_itemID= $_REQUEST['item_id'];
-
-	$ewim_userID= $ewim_current_user->ID;
-	$ewim_debug_settings= new ewim_debug_settings();
-	$ewim_activeGameID= get_user_meta($ewim_userID, 'active_game', true);
-	//endregion
-	$ewim_currentFilter= current_filter();
-	$ewim_field= str_replace('gform_field_value_', '', $ewim_currentFilter);
-	$ewim_aItem= $wpdb->get_row( "SELECT * FROM $ewim_tables->ewim_items WHERE id = '$ewim_itemID'", ARRAY_A );
-	$ewim_aItem['item_recipe_ingredients']= json_decode($ewim_aItem['item_recipe_ingredients'], true);
-	foreach($ewim_aItem['item_recipe_ingredients'] as $ewim_key => $ewim_value){
-		$ewim_aItem[$ewim_key]= $ewim_value;
-	}
-
-	return $ewim_aItem[$ewim_field];
-}
-*/
