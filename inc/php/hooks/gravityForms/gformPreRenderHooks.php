@@ -155,7 +155,7 @@ function create_input_fields($ewim_oForm){
 
 	//region Step 2: Switch to processor based on Form Title
 	switch ($ewim_formName){
-		case "IM-02. Item":
+		case "Item Form":
 			//region Item Form Step 1: Get the game system
 			$ewim_aGame= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_games WHERE id = $ewim_activeGameID",ARRAY_A);
 			//endregion
@@ -534,11 +534,13 @@ function create_input_fields($ewim_oForm){
 					}
 					//endregion
 
+					//endregion
+
 					break;
 			}
 			//endregion
 			break;
-		case "IM-03. Item Adjust":
+		case "Item Transaction Form":
 			//region Global Variables, Classes, Local Variables
 			$ewim_fieldCSS= 'gf_left_half';//Sets the starting CSS Class for new fields
 			$ewim_itemCount= 1;
@@ -1271,7 +1273,7 @@ function create_input_fields($ewim_oForm){
 			//endregion
 
 			break;
-		case "IM-04. Posted Adjust":
+		case "Posted Transaction Form":
 			//region Global Variables, Classes, Local Variables
 			$ewim_fieldCSS= 'gf_left_half';//Sets the starting CSS Class for new fields
 			$ewim_itemCount= 1;
