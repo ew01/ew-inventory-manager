@@ -24,7 +24,7 @@ add_action("gform_pre_submission", 'ewim_master_pre_submission' );
 //endregion
 function ewim_master_pre_submission($ewim_oForm){
 	//region Classes, Global Variables, Local Variables
-	$ewim_tables= new ewim_tables();
+	$ewim_cTables= new ewim_tables();
 	//$ewim_get_options= new ewim_get_options();
 	$ewim_debug_settings= new ewim_debug_settings();
 	$ewim_current_user= wp_get_current_user();
@@ -33,7 +33,7 @@ function ewim_master_pre_submission($ewim_oForm){
 
 	global $wpdb;
 
-	$ewim_aGame= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_games WHERE id = $ewim_activeGameID",ARRAY_A);
+	$ewim_aGame= $wpdb->get_row("SELECT * FROM $ewim_cTables->ewim_games WHERE id = $ewim_activeGameID",ARRAY_A);
 	//endregion
 
 	//region Form Object Debug
@@ -71,7 +71,8 @@ function ewim_master_pre_submission($ewim_oForm){
 							case "processor":
 								break;
 							case "table":
-								$ewim_editTableName= $ewim_tables->$_POST['input_'.$ewim_aField['id']];
+								$ewim_tableName= $_POST['input_'.$ewim_aField['id']];
+								$ewim_editTableName= $ewim_cTables->$ewim_tableName;
 								break;
 							case "record_id":
 								$ewim_recordID= $_POST['input_'.$ewim_aField['id']];
@@ -133,7 +134,7 @@ function ewim_master_pre_submission($ewim_oForm){
 			//region If BPC, get info from BPO
 			if($ewim_aItemMeta['BPO'] > 0){
 				$ewim_bpoID= $ewim_aItemMeta['BPO'];
-				$ewim_aBPO= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_items WHERE id = $ewim_bpoID",ARRAY_A);
+				$ewim_aBPO= $wpdb->get_row("SELECT * FROM $ewim_cTables->ewim_items WHERE id = $ewim_bpoID",ARRAY_A);
 				$ewim_aIngredients= json_decode($ewim_aBPO['item_recipe_ingredients'], true);
 				$ewim_bpoMeta= json_decode($ewim_aBPO['item_meta'], true);
 				$ewim_aItemMeta['Product']= $ewim_bpoMeta['Product'];
@@ -223,7 +224,8 @@ function ewim_master_pre_submission($ewim_oForm){
 							case "processor":
 								break;
 							case "table":
-								$ewim_editTableName= $ewim_tables->$_POST['input_'.$ewim_aField['id']];
+								$ewim_tableName= $_POST['input_'.$ewim_aField['id']];
+								$ewim_editTableName= $ewim_cTables->$ewim_tableName;
 								break;
 							case "record_id":
 								$ewim_recordID= $_POST['input_'.$ewim_aField['id']];
@@ -240,7 +242,8 @@ function ewim_master_pre_submission($ewim_oForm){
 								$ewim_action= $_POST['input_'.$ewim_aField['id']];
 								break;
 							default:
-								$$ewim_aField['adminLabel']= $_POST['input_'.$ewim_aField['id']];
+								$ewim_fieldAdminLabel= $ewim_aField['adminLabel'];
+								$$ewim_fieldAdminLabel= $_POST['input_'.$ewim_aField['id']];
 								break;
 						}
 						break;
@@ -249,7 +252,7 @@ function ewim_master_pre_submission($ewim_oForm){
 			//endregion
 
 			//region Item Transaction Step 2: Filter to Correct Action, Make Calculations
-			$ewim_aItem= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_items WHERE id = $ewim_recordID", ARRAY_A);
+			$ewim_aItem= $wpdb->get_row("SELECT * FROM $ewim_cTables->ewim_items WHERE id = $ewim_recordID", ARRAY_A);
 			switch ($ewim_aGame['game_system']){
 				case "DnD":
 					switch ($ewim_action){
@@ -290,7 +293,7 @@ function ewim_master_pre_submission($ewim_oForm){
 									'average_cost'      => $ewim_copper,
 									'total_cost'        => $ewim_buyTotalCost,
 								);
-								$ewim_insertResult= ewim_wpdb_edit('insert',$ewim_tables->ewim_ledger,$ewim_aLedgerInsert);
+								$ewim_insertResult= ewim_wpdb_edit('insert',$ewim_cTables->ewim_ledger,$ewim_aLedgerInsert);
 
 							}
 
@@ -329,7 +332,7 @@ function ewim_master_pre_submission($ewim_oForm){
 									'average_cost'      => $ewim_copper,
 									'total_cost'        => $ewim_sellTotalCost,
 								);
-								$ewim_insertResult= ewim_wpdb_edit('insert',$ewim_tables->ewim_ledger,$ewim_aLedgerInsert);
+								$ewim_insertResult= ewim_wpdb_edit('insert',$ewim_cTables->ewim_ledger,$ewim_aLedgerInsert);
 							}
 
 							break;
@@ -368,7 +371,7 @@ function ewim_master_pre_submission($ewim_oForm){
 								$ewim_aIngredientItemNameID= explode("_",$ewim_ingredientNameID);
 								$ewim_ingredientID= $ewim_aIngredientItemNameID[1];
 
-								$ewim_aIngredientItem= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_items WHERE id = $ewim_ingredientID",ARRAY_A);
+								$ewim_aIngredientItem= $wpdb->get_row("SELECT * FROM $ewim_cTables->ewim_items WHERE id = $ewim_ingredientID",ARRAY_A);
 								$ewim_craftingCost= $ewim_craftingCost + ($ewim_aIngredientItem['cost'] * $ewim_ingredientAmount);
 
 								$ewim_aInsert['item_inventory_quantity']= $ewim_aIngredientItem['item_inventory_quantity'] - $ewim_ingredientAmount;
@@ -466,7 +469,7 @@ function ewim_master_pre_submission($ewim_oForm){
 									'sales_tax'                 => 0,
 									'difference'                => $ewim_difference
 								);
-								$ewim_insertResult= ewim_wpdb_edit('insert',$ewim_tables->ewim_ledger,$ewim_aLedgerInsert);
+								$ewim_insertResult= ewim_wpdb_edit('insert',$ewim_cTables->ewim_ledger,$ewim_aLedgerInsert);
 								//endregion
 							}
 							//endregion
@@ -541,7 +544,7 @@ function ewim_master_pre_submission($ewim_oForm){
 									'sales_tax'                 => $ewim_salesTax,
 									'difference'                => $ewim_difference
 								);
-								$ewim_insertResult= ewim_wpdb_edit('insert',$ewim_tables->ewim_ledger,$ewim_aLedgerInsert);
+								$ewim_insertResult= ewim_wpdb_edit('insert',$ewim_cTables->ewim_ledger,$ewim_aLedgerInsert);
 								//endregion
 							}
 
@@ -557,7 +560,7 @@ function ewim_master_pre_submission($ewim_oForm){
 								//reset insert array
 								$ewim_aInsert= NULL;
 								//Get mineral Record
-								$ewim_aIngredientItem= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_items WHERE id = $ewim_mineralID",ARRAY_A);
+								$ewim_aIngredientItem= $wpdb->get_row("SELECT * FROM $ewim_cTables->ewim_items WHERE id = $ewim_mineralID",ARRAY_A);
 								//Assemble dynamic field names
 								$ewim_mineralFieldAdminLabel= "process_".$ewim_mineralName.'_'.$ewim_mineralID;
 								$ewim_mineralProcessingCostFieldAdminLabel= "process_cost_".$ewim_mineralName.'_'.$ewim_mineralID;
@@ -566,7 +569,7 @@ function ewim_master_pre_submission($ewim_oForm){
 								$ewim_aInsert['item_inventory_quantity']= $ewim_aIngredientItem['item_inventory_quantity'] + $$ewim_mineralFieldAdminLabel;
 								$ewim_aInsert['cost']= $$ewim_mineralProcessingCostFieldAdminLabel + $ewim_aIngredientItem['cost'];
 
-								$ewim_mineralUpdateResult= ewim_wpdb_edit('update',$ewim_tables->ewim_items,$ewim_aInsert,$ewim_mineralID);
+								$ewim_mineralUpdateResult= ewim_wpdb_edit('update',$ewim_cTables->ewim_items,$ewim_aInsert,$ewim_mineralID);
 
 								$ewim_difference= $ewim_difference - $$ewim_mineralProcessingCostFieldAdminLabel;
 							}
@@ -578,7 +581,7 @@ function ewim_master_pre_submission($ewim_oForm){
 							$ewim_aInsert['item_inventory_quantity']= $ewim_aItem['item_inventory_quantity'] - $amount_Process;
 
 							//Insert to DB
-							$ewim_updateResult= ewim_wpdb_edit('update',$ewim_tables->ewim_items,$ewim_aInsert,$ewim_recordID);
+							$ewim_updateResult= ewim_wpdb_edit('update',$ewim_cTables->ewim_items,$ewim_aInsert,$ewim_recordID);
 							if($ewim_updateResult['error'] == 'Error'){
 								//todo echo friendly error
 								if($ewim_debug_settings->ewim_wpdbEdit == 1){
@@ -609,7 +612,7 @@ function ewim_master_pre_submission($ewim_oForm){
 									'sales_tax'                 => 0,
 									'difference'                => $ewim_difference
 								);
-								$ewim_insertResult= ewim_wpdb_edit('insert',$ewim_tables->ewim_ledger,$ewim_aLedgerInsert);
+								$ewim_insertResult= ewim_wpdb_edit('insert',$ewim_cTables->ewim_ledger,$ewim_aLedgerInsert);
 								//endregion
 							}
 							//endregion
@@ -627,7 +630,7 @@ function ewim_master_pre_submission($ewim_oForm){
 							$ewim_aItemMeta= json_decode($ewim_aItem['item_meta'], true);
 							$ewim_aItemRecipe= json_decode($ewim_aItem['item_recipe_ingredients'],true);//Blueprint Recipe
 							$ewim_productID= $ewim_aItemMeta['Product'];//Product ID
-							$ewim_aProduct= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_items WHERE id = $ewim_productID", ARRAY_A);//Product, needed to calculate new prices and quantities
+							$ewim_aProduct= $wpdb->get_row("SELECT * FROM $ewim_cTables->ewim_items WHERE id = $ewim_productID", ARRAY_A);//Product, needed to calculate new prices and quantities
 							//endregion
 
 							//region Switch on Item Category
@@ -642,7 +645,7 @@ function ewim_master_pre_submission($ewim_oForm){
 								//reset insert array
 								$ewim_aInsert= NULL;
 								//Get the Item
-								$ewim_aIngredientItem= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_items WHERE id = $ewim_ingredientID",ARRAY_A);
+								$ewim_aIngredientItem= $wpdb->get_row("SELECT * FROM $ewim_cTables->ewim_items WHERE id = $ewim_ingredientID",ARRAY_A);
 
 								$ewim_ingredientFieldAdminLabel= "manufacture_".$ewim_ingredientName.'_'.$ewim_ingredientID;
 
@@ -723,7 +726,7 @@ function ewim_master_pre_submission($ewim_oForm){
 									'sales_tax'                 => 0,
 									'difference'                => $ewim_difference
 								);
-								$ewim_insertResult= ewim_wpdb_edit('insert',$ewim_tables->ewim_ledger,$ewim_aLedgerInsert);
+								$ewim_insertResult= ewim_wpdb_edit('insert',$ewim_cTables->ewim_ledger,$ewim_aLedgerInsert);
 								//endregion
 
 								//region Update BPC Totals
@@ -747,7 +750,7 @@ function ewim_master_pre_submission($ewim_oForm){
 							$ewim_copyCost= $copy_cost;
 
 							//region Get BPCs, loop and find correct BPC
-							$ewim_aBPCs= $wpdb->get_results("SELECT * FROM $ewim_tables->ewim_items WHERE category = 'Blueprint Copy'", ARRAY_A);
+							$ewim_aBPCs= $wpdb->get_results("SELECT * FROM $ewim_cTables->ewim_items WHERE category = 'Blueprint Copy'", ARRAY_A);
 
 							foreach($ewim_aBPCs as $ewim_aBPCData){
 								$ewim_aBPCMeta= json_decode($ewim_aBPCData['item_meta'], true);
@@ -811,7 +814,7 @@ function ewim_master_pre_submission($ewim_oForm){
 									'sales_tax'                 => 0,
 									'difference'                => $ewim_difference
 								);
-								$ewim_insertResult= ewim_wpdb_edit('insert',$ewim_tables->ewim_ledger,$ewim_aLedgerInsert);
+								$ewim_insertResult= ewim_wpdb_edit('insert',$ewim_cTables->ewim_ledger,$ewim_aLedgerInsert);
 								//endregion
 							}
 							//endregion
@@ -864,7 +867,7 @@ function ewim_master_pre_submission($ewim_oForm){
 								'post_price'    => $ewim_postPrice,
 								'average'       => $ewim_averageProductionCostCost
 							);
-							$ewim_insertPostedResult= ewim_wpdb_edit('insert',$ewim_tables->ewim_posted,$ewim_aInsertPosted);
+							$ewim_insertPostedResult= ewim_wpdb_edit('insert',$ewim_cTables->ewim_posted,$ewim_aInsertPosted);
 
 							//region Error Check, Ledger Write
 							if($ewim_insertPostedResult['error'] == 'Error'){
@@ -895,7 +898,7 @@ function ewim_master_pre_submission($ewim_oForm){
 									'sales_tax'                 => 0,
 									'difference'                => $ewim_difference
 								);
-								$ewim_insertResult= ewim_wpdb_edit('insert',$ewim_tables->ewim_ledger,$ewim_aLedgerInsert);
+								$ewim_insertResult= ewim_wpdb_edit('insert',$ewim_cTables->ewim_ledger,$ewim_aLedgerInsert);
 								//endregion
 							}
 							//endregion
@@ -927,7 +930,7 @@ function ewim_master_pre_submission($ewim_oForm){
 							case "processor":
 								break;
 							case "table":
-								//$ewim_editTableName= $ewim_tables->$_POST['input_'.$ewim_aField['id']];
+								//$ewim_editTableName= $ewim_cTables->$_POST['input_'.$ewim_aField['id']];
 								break;
 							case "record_id":
 								$ewim_recordID= $_POST['input_'.$ewim_aField['id']];
@@ -944,7 +947,8 @@ function ewim_master_pre_submission($ewim_oForm){
 								$ewim_action= $_POST['input_'.$ewim_aField['id']];
 								break;
 							default:
-								$$ewim_aField['adminLabel']= $_POST['input_'.$ewim_aField['id']];
+								$ewim_fieldAdminLabel= $ewim_aField['adminLabel'];
+								$$ewim_fieldAdminLabel= $_POST['input_'.$ewim_aField['id']];
 								break;
 						}
 						break;
@@ -955,7 +959,7 @@ function ewim_master_pre_submission($ewim_oForm){
 			switch ($ewim_action){
 				case 'Sell':
 					//region Sell Posted Step 1
-					$ewim_aPost= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_posted WHERE id = $ewim_recordID",ARRAY_A);//Get Items
+					$ewim_aPost= $wpdb->get_row("SELECT * FROM $ewim_cTables->ewim_posted WHERE id = $ewim_recordID",ARRAY_A);//Get Items
 
 					$ewim_amountSold= $amount_Sell;
 					$ewim_taxesPaid= $taxes_paid;
@@ -981,7 +985,7 @@ function ewim_master_pre_submission($ewim_oForm){
 					}
 					//endregion
 
-					$ewim_insertPostedResult= ewim_wpdb_edit('update',$ewim_tables->ewim_posted,$ewim_aInsertPosted,$ewim_recordID);
+					$ewim_insertPostedResult= ewim_wpdb_edit('update',$ewim_cTables->ewim_posted,$ewim_aInsertPosted,$ewim_recordID);
 					//endregion
 
 					//region Write to Ledger
@@ -1002,13 +1006,13 @@ function ewim_master_pre_submission($ewim_oForm){
 						'sales_tax'                 => $ewim_taxesPaid,
 						'difference'                => $ewim_totalSellCost - $ewim_taxesPaid - $ewim_brokerFees - $ewim_totalProductionCost
 					);
-					$ewim_insertResult= ewim_wpdb_edit('insert',$ewim_tables->ewim_ledger,$ewim_aLedgerInsert);
+					$ewim_insertResult= ewim_wpdb_edit('insert',$ewim_cTables->ewim_ledger,$ewim_aLedgerInsert);
 					//endregion
 
 					break;
 				case 'Remove':
 					//region Remove Posted Step 1
-					$ewim_aPost= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_posted WHERE id = $ewim_recordID",ARRAY_A);//Get Items
+					$ewim_aPost= $wpdb->get_row("SELECT * FROM $ewim_cTables->ewim_posted WHERE id = $ewim_recordID",ARRAY_A);//Get Items
 
 					$ewim_amountRemoved= $amount_Remove;
 					//$ewim_taxesPaid= $taxes_paid;
@@ -1034,12 +1038,12 @@ function ewim_master_pre_submission($ewim_oForm){
 					}
 					//endregion
 
-					$ewim_insertPostedResult= ewim_wpdb_edit('update',$ewim_tables->ewim_posted,$ewim_aInsertPosted,$ewim_recordID);
+					$ewim_insertPostedResult= ewim_wpdb_edit('update',$ewim_cTables->ewim_posted,$ewim_aInsertPosted,$ewim_recordID);
 					//endregion
 
 					//region Update Item Record
 					$ewim_itemID= $ewim_aPost['item_id'];
-					$ewim_aItem= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_items WHERE id = $ewim_itemID",ARRAY_A);//Get Items
+					$ewim_aItem= $wpdb->get_row("SELECT * FROM $ewim_cTables->ewim_items WHERE id = $ewim_itemID",ARRAY_A);//Get Items
 
 					$ewim_totalProductionCost= $ewim_aPost['average'] * $ewim_amountRemoved;
 					$ewim_brokerFees= ($ewim_aPost['broker_fee'] / $ewim_aPost['amount']) * $ewim_amountRemoved;
@@ -1047,7 +1051,7 @@ function ewim_master_pre_submission($ewim_oForm){
 
 					$ewim_aInsert['cost']= $ewim_aItem['cost'] + $ewim_newTotalProductionCost;
 
-					$ewim_updateResult= ewim_wpdb_edit('update',$ewim_tables->ewim_items,$ewim_aInsert,$ewim_itemID);
+					$ewim_updateResult= ewim_wpdb_edit('update',$ewim_cTables->ewim_items,$ewim_aInsert,$ewim_itemID);
 					//endregion
 
 					break;

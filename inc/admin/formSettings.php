@@ -34,6 +34,7 @@ if($_POST['ewim_submit'] == 'Y'){
 	$ewim_gameFormID= $_POST['ewim_gameFormID'];
 	update_option('ewim_gameFormID', $ewim_gameFormID);
     //endregion
+
 	//region Form Pages
 	$ewim_itemFormPage= $_POST['ewim_itemFormPage'];
 	update_option('ewim_itemFormPage', $ewim_itemFormPage);
@@ -49,15 +50,17 @@ else{
 	// Normal Page display
 	$ewim_displayMessage=    "none";
 
-	//Form IDs
+	//region Form IDs
 	$ewim_itemFormID=       get_option('ewim_itemFormID');
 	$ewim_acquireFormID=     get_option('ewim_acquireFormID');
 	$ewim_gameFormPage=     get_option('ewim_gameFormPage');
 	$ewim_gameFormID=     get_option('ewim_gameFormID');
+	//endregion
 
-    //Form Pages
+    //region Form Pages
 	$ewim_itemFormPage=     get_option('ewim_itemFormPage');
 	$ewim_gameFormPage=   get_option('ewim_gameFormPage');
+	//endregion
 
 }
 
@@ -73,7 +76,6 @@ else{
 				<?= __("Settings have been updated.")?>
 			</p>
 		</div>
-
 
 		<div style="float: left;width: 50%">
             <h3><?=__("Form IDs")?></h3>

@@ -3,7 +3,7 @@
  * Plugin Name: EW Inventory Manager
  * Plugin URI: 
  * Description: Manage your inventory and average item cost
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: David Ellenburg II
  * Author URI: http://www.ellenburgweb.com
  * License: 
@@ -11,6 +11,7 @@
 
 //todo: add ability to make a transaction that may not involve users items
 //todo: add a consume item action, should not have a negative balance since item is in inventory.
+//todo: Add form name to admin section for presubmissionhooks
 
 //region Includes
 include_once ( __DIR__ . "/inc/inc.php" );

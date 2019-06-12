@@ -538,6 +538,8 @@ function create_input_fields($ewim_oForm){
 					}
 					//endregion
 
+					//endregion
+
 					break;
 			}
 			//endregion
