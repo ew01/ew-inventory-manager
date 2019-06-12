@@ -23,6 +23,12 @@ $ewim_activeGameName= get_user_meta($ewim_userID, 'active_game_name', true);
 $ewim_activeGameSystem= get_user_meta($ewim_userID, 'active_game_system', true);
 //endregion
 
+//region Check for Active Game
+if($ewim_activeGameID == ''){
+	$ewim_content.="<p>Please Activate a game from the Game List page</p>";
+}
+else{
+
 //region Step 1: Get All items belonging to currently active game. Loop and round Costs. Encode to json for display
 $ewim_aItems= $wpdb->get_results("SELECT * FROM $ewim_tables->ewim_items WHERE user_id = $ewim_userID AND game_id = $ewim_activeGameID",ARRAY_A);//Get Items
 
@@ -162,4 +168,6 @@ $ewim_content.= <<<EOV
             <!--<pagination ng-model="currentPage" total-items="data.length" max-size="maxSize" boundary-links="true"></pagination>-->
         </div>
 EOV;
+//endregion
+}
 //endregion

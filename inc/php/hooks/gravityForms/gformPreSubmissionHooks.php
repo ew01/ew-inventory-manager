@@ -54,7 +54,7 @@ function ewim_master_pre_submission($ewim_oForm){
 	switch ($ewim_formProcessor){
 		case "default":
 			//region Initial Variable Declaration
-			$ewim_aItemMeta['BPO']= '';
+			$ewim_aItemMeta= array();
 			$ewim_aInputFields= array();
 			$ewim_aIngredients= array();
 			$ewim_recordID= 0;
@@ -146,7 +146,7 @@ function ewim_master_pre_submission($ewim_oForm){
 				$ewim_aInsert['item_recipe_ingredients']= json_encode($ewim_aIngredients);
 			}
 
-			if($ewim_aItemMeta != ''){
+			if(!empty($ewim_aItemMeta)){
 				$ewim_aInsert['item_meta']= json_encode($ewim_aItemMeta);
 			}
 
