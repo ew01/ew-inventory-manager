@@ -19,3 +19,4 @@ include_once ( __DIR__ . "/php/hooks/_pluginHooksInc.php" );//Hooks | Only inclu
 include_once ( __DIR__ . "/php/wp/_wpIncludes.php" );//WP Get Options
 include_once ( __DIR__ . "/php/debugSettingsClass.php" );
 include_once ( __DIR__ . "/php/ewimFunctions.php" );
+include_once ( __DIR__ . "/admin/userProfile.php" );

@@ -87,7 +87,7 @@ else{
                         <label for="ewim_itemFormID" style="width:200px;"><?= __("Item Form ID: ")?></label>
                     </th>
                     <td>
-                        <input name="ewim_itemFormID" type="text" value="<?= $ewim_itemFormID;?>" /><?= __("Example: 1")?>
+                        <input id="ewim_itemFormID" name="ewim_itemFormID" type="text" value="<?= $ewim_itemFormID;?>" /><?= __("Example: 1")?>
                     </td>
                 </tr>
                 <!--Game Form-->
@@ -96,7 +96,7 @@ else{
                         <label for="ewim_gameFormID" style="width:200px;"><?= __("Remove Form ID: ")?></label>
                     </th>
                     <td>
-                        <input name="ewim_gameFormID" type="text" value="<?= $ewim_gameFormID;?>" /><?= __("Example: 1")?>
+                        <input id="ewim_gameFormID" name="ewim_gameFormID" type="text" value="<?= $ewim_gameFormID;?>" /><?= __("Example: 1")?>
                     </td>
                 </tr>
                 </tbody>
@@ -112,7 +112,7 @@ else{
 						<label for="ewim_itemFormPage" style="width:200px;"><?= __("Item Form Page: ")?></label>
 					</th>
 					<td>
-						<input name="ewim_itemFormPage" type="text" value="<?= $ewim_itemFormPage;?>" /><?= __("Example: Item Form")?>
+						<input id="ewim_itemFormPage" name="ewim_itemFormPage" type="text" value="<?= $ewim_itemFormPage;?>" /><?= __("Example: Item Form")?>
 					</td>
 				</tr>
                 <!--Sell Form-->
@@ -121,7 +121,7 @@ else{
                         <label for="ewim_sellPostedFormPage" style="width:200px;"><?= __("Sell Posted Page: ")?></label>
                     </th>
                     <td>
-                        <input name="ewim_sellPostedFormPage" type="text" value="<?= $ewim_sellPostedFormPage;?>" /><?= __("Example: Sell Posted")?>
+                        <input id="ewim_sellPostedFormPage" name="ewim_sellPostedFormPage" type="text" value="<?= $ewim_sellPostedFormPage;?>" /><?= __("Example: Sell Posted")?>
                     </td>
                 </tr>
                 <!--Game Form-->
@@ -130,7 +130,7 @@ else{
                         <label for="ewim_gameFormPage" style="width:200px;"><?= __("Item Form Page: ")?></label>
                     </th>
                     <td>
-                        <input name="ewim_gameFormPage" type="text" value="<?= $ewim_gameFormPage;?>" /><?= __("Example: Game Form")?>
+                        <input id="ewim_gameFormPage" name="ewim_gameFormPage" type="text" value="<?= $ewim_gameFormPage;?>" /><?= __("Example: Game Form")?>
                     </td>
                 </tr>
 				</tbody>
@@ -138,8 +138,6 @@ else{
 
 
 		</div>
-
-
 
 		<br clear="all"/>
 
