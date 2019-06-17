@@ -22,6 +22,13 @@ $ewim_debug_settings= new ewim_debug_settings();
 //region Step 1: Get the games for the user from the database, mark the active one before json encode
 $ewim_aGames= $wpdb->get_results("SELECT * FROM $ewim_tables->ewim_games WHERE user_id = $ewim_userID",ARRAY_A);//Get Games
 
+//region Get Max Games Allowed, display add game accordingly
+$ewim_userMaxGames= (get_user_meta($ewim_userID, 'max_games', true) == '' ? 2 : get_user_meta($ewim_userID, 'max_games', true));
+if($wpdb->num_rows < $ewim_userMaxGames){
+	$ewim_newGameLink= "<a href='$ewim_gameFormPageURL'><i class='fa fa-plus-circle' aria-hidden='true'></i></a>";
+}
+//endregion
+
 //region Step 1.1: Set up the Active game
 if($_REQUEST['action'] == 'activate'){
 	//$ewim_current_user
@@ -82,7 +89,7 @@ $ewim_defaultOrderBy= 'name';
 require_once( __DIR__."/../js/angular.php" );
 $ewim_content.= <<<EOV
     <div id='gameList' ng-app='listApp' ng-controller='listController' class='default-padding'>
-        <h1>Games <a href='$ewim_gameFormPageURL'><i class='fa fa-plus-circle' aria-hidden='true'></i></a></h1>     
+        <h1>Games $ewim_newGameLink</h1>     
         <h4>{{data.length}} Games</h4>
         <p><a href="$ewim_viewItemsLink">View Items for Active Game</a></p>
             <p style='padding-bottom: 0;'>Text Filter</p>

@@ -67,7 +67,7 @@ else{
                         <label for="ewim_itemPage" style="width:200px;"><?= __("Item Details: ")?></label>
                     </th>
                     <td>
-                        <input name="ewim_itemPage" type="text" value="<?= $ewim_itemPage;?>" /><?= __("Example: Item Details")?>
+                        <input id="ewim_itemPage" name="ewim_itemPage" type="text" value="<?= $ewim_itemPage;?>" /><?= __("Example: Item Details")?>
                     </td>
                 </tr>
 
@@ -77,7 +77,7 @@ else{
                         <label for="ewim_postPage" style="width:200px;"><?= __("Post Details: ")?></label>
                     </th>
                     <td>
-                        <input name="ewim_postPage" type="text" value="<?= $ewim_postPage;?>" /><?= __("Example: Post Details")?>
+                        <input id="ewim_postPage" name="ewim_postPage" type="text" value="<?= $ewim_postPage;?>" /><?= __("Example: Post Details")?>
                     </td>
                 </tr>
 
@@ -87,7 +87,7 @@ else{
                         <label for="ewim_itemListPage" style="width:200px;"><?= __("Item List: ")?></label>
                     </th>
                     <td>
-                        <input name="ewim_itemListPage" type="text" value="<?= $ewim_itemListPage;?>" /><?= __("Example: Item List")?>
+                        <input id="ewim_itemListPage" name="ewim_itemListPage" type="text" value="<?= $ewim_itemListPage;?>" /><?= __("Example: Item List")?>
                     </td>
                 </tr>
 

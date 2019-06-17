@@ -3,7 +3,7 @@
  * Plugin Name: EW Inventory Manager
  * Plugin URI: 
  * Description: Manage your inventory and average item cost
- * Version: 1.0.2
+ * Version: 1.0.3
  * Author: David Ellenburg II
  * Author URI: http://www.ellenburgweb.com
  * License: 
@@ -27,14 +27,16 @@ $ewim_updateChecker = Puc_v4_Factory::buildUpdateChecker(
 //endregion
 
 //region Register and Add Assets
-//JavaScript Register Function
+//region JavaScript Register Function
 function ewim_javascript(){
 	wp_enqueue_script('angularJS', '//ajax.googleapis.com/ajax/libs/angularjs/1.7.2/angular.min.js');
 	wp_enqueue_script('ui-bootstrap', 'http://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.12.1.min.js');
 }
 //Add JavaScript
 add_action('wp_enqueue_scripts','ewim_javascript');
-//CSS Register Function
+//endregion
+
+//region CSS Register Function
 function ewim_css(){
 	wp_enqueue_style( 'plugin-css', plugins_url('ew-inventory-manager/inc/css/main.css'));//Plugin CSS
 	wp_enqueue_style( 'ui-bootstrap','//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' );//UI Bootstrap//Somehow messes with the WP css that does the drop down menu icons
@@ -42,18 +44,19 @@ function ewim_css(){
 }
 //Add CSS
 add_action( 'wp_enqueue_scripts', 'ewim_css' );
+//endregion
+//endregion
 
-/**
- * Admin Pages
- */
+//region Admin Pages
 //Info Page
 function ewim_information() {
 
 }
-//Forms Page
+//Form Settings
 function ewim_form_settings() {
 	require_once (__DIR__."/inc/admin/formSettings.php");//Include Global Variables
 }
+//Page Settings
 function ewim_page_settings() {
 	require_once ( __DIR__ . "/inc/admin/pageSettings.php" );//Include Global Variables
 }
@@ -63,8 +66,11 @@ function ewim_admin_actions() {
 	add_submenu_page( 'ewim', 'Form Settings', 'Form Settings', 'manage_options', 'ewimFS', 'ewim_form_settings');
 	add_submenu_page( 'ewim', 'Page Settings', 'Page Settings', 'manage_options', 'ewimPS', 'ewim_page_settings');
 }
-//Create the Base Plugin Files Menus
+//Create the Menus
 add_action('admin_menu', 'ewim_admin_actions');
+
+//User Profile Additions
+
 //endregion
 
 //region Shortcode Function
@@ -79,15 +85,20 @@ function ewim_page($ewim_parameters){
 		require_once ( __DIR__ . "/inc/php/wp/user_data.php" );
 		//$ewim_current_user= wp_get_current_user();
 
-		//region Get Page path from Shortcode
-		$ewim_pagePath= (isset($ewim_parameters['page']) ? $ewim_parameters['page'] : 'gameList');
-
+		//region Get Page Name and Module Name
+		$ewim_pageName= (isset($ewim_parameters['page']) ? $ewim_parameters['page'] : 'gameList');
+		$ewim_moduleName= (isset($ewim_parameters['module']) ? $ewim_parameters['module'] : '');
 		//endregion
 
 		//region Include the requested page
-		//Get requested page from Shortcode
-		/** @noinspection PhpIncludeInspection */
-		include_once( __DIR__ . "/inc/modules/$ewim_pagePath.php" );
+		if($ewim_moduleName != ''){
+			/** @noinspection PhpIncludeInspection */
+			include_once( __DIR__ . "/inc/modules/$ewim_moduleName/$ewim_pageName.php" );
+		}
+		else{
+			/** @noinspection PhpIncludeInspection */
+			include_once( __DIR__ . "/inc/modules/$ewim_pageName.php" );
+		}
 		return $ewim_content;
 		//endregion
 	}
@@ -98,7 +109,7 @@ function ewim_page($ewim_parameters){
 	}
 	//endregion
 }
-//Shortcode [ewim page='']
+//Shortcode [ewim module='' page=''] or [ewim page='']
 add_shortcode( 'ewim', 'ewim_page');
 //endregion
 

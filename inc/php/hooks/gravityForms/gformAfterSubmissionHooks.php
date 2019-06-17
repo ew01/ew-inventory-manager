@@ -25,3 +25,14 @@ add_action( "gform_after_submission_$ewim_removeFormID", 'remove_form_entry' );
 function remove_form_entry( $entry ) {
 	GFAPI::delete_entry( $entry['id'] );
 }
+
+/**
+ * Name: Process Donation
+ */
+add_action( 'gform_paypal_fulfillment', 'ewim_process_donation', 10, 4 );
+function ewim_process_donation($ewim_entry, /** @noinspection PhpUnusedParameterInspection */$ewim_feed, /** @noinspection PhpUnusedParameterInspection */$ewim_transaction_id, $ewim_amount){
+	$ewim_userID= rgar($ewim_entry, '1');
+	$ewim_currentMax= get_user_meta($ewim_userID, 'max_games',true);
+	$ewim_newMax= $ewim_currentMax + $ewim_amount;
+	update_user_meta($ewim_userID,'max_games',$ewim_newMax);
+}
