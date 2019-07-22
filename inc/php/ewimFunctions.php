@@ -81,3 +81,26 @@ function ewim_wpdb_edit($ewim_action, $ewim_table, $ewim_aInsert, $ewim_recordID
 		return $ewim_aReturn;
 	}
 }
+
+/**
+ * Name: EWIM Get Meta Value
+ * Desc:
+ *
+ * @param $ewim_metaKey
+ *
+ * @return array
+ */
+function ewim_get_meta_value($ewim_metaKey){
+	//region Global Variables, Classes, Class Variables, Local Variables
+	global $wpdb;
+
+	$ewim_tables= new ewim_tables();
+
+	//endregion
+
+
+	$ewim_aCategoriesRecord= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_meta_data WHERE meta_key = '$ewim_metaKey'", ARRAY_A);
+	$ewim_aCategories= explode(',', $ewim_aCategoriesRecord['meta_value']);
+
+	return $ewim_aCategories;
+}

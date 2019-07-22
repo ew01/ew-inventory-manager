@@ -27,6 +27,7 @@ $ewim_activeGameSystem= get_user_meta($ewim_userID, 'active_game_system', true);
 
 //region Step 1: Get Item Information, decode where needed
 $ewim_aItem= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_items WHERE id = $ewim_itemID AND user_id = $ewim_userID",ARRAY_A);
+$ewim_gameID= $ewim_aItem['game_id'];
 $ewim_aItem['item_recipe_ingredients']= json_decode($ewim_aItem['item_recipe_ingredients'], true);
 $ewim_recipeCount= count($ewim_aItem['item_recipe_ingredients']);
 //endregion
@@ -97,8 +98,9 @@ if($ewim_aItem['item_recipe_ingredients'] != ''){
 //Edit Button
 $ewim_itemFormPageURL= get_permalink(get_page_by_title($ewim_get_options->ewim_itemFormPage));
 $ewim_editItemButton="
-<form action='$ewim_itemFormPageURL' method='post' style='display: inline'>
+<form action='$ewim_itemFormPageURL' style='display: inline'>
 	<input type='hidden' name='record_id' value='$ewim_itemID'>
+	<input type='hidden' name='game_id' value='$ewim_gameID'>
 	<button style='border:0;padding:0;display:inline;background:none;color:#55cbff;'>Edit</button>
 </form>
 ";

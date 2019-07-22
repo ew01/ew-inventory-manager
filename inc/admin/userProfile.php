@@ -13,9 +13,9 @@
 
 
 //add_action( 'show_user_profile', 'extra_user_profile_fields' );//User Level
-add_action( 'edit_user_profile', 'extra_user_profile_fields' );//Admin Level
+add_action( 'edit_user_profile', 'ewim_extra_user_profile_fields' );//Admin Level
 
-function extra_user_profile_fields( $user ) {
+function ewim_extra_user_profile_fields( $user ) {
 	?>
 	<h3><?php _e("Gaming Inventory Data", "blank"); ?></h3>
 
@@ -51,9 +51,9 @@ function extra_user_profile_fields( $user ) {
 }
 
 //add_action( 'personal_options_update', 'save_extra_user_profile_fields' );//User Level
-add_action( 'edit_user_profile_update', 'save_extra_user_profile_fields' );//Admin Level
+add_action( 'edit_user_profile_update', 'ewim_save_extra_user_profile_fields' );//Admin Level
 
-function save_extra_user_profile_fields( $user_id ) {
+function ewim_save_extra_user_profile_fields( $user_id ) {
 	if ( !current_user_can( 'edit_user', $user_id ) ) {
 		return false;
 	}

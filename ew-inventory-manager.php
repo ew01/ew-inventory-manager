@@ -12,6 +12,10 @@
 //todo: add ability to make a transaction that may not involve users items
 //todo: add a consume item action, should not have a negative balance since item is in inventory.
 //todo: Add form name to admin section for gformPreSubmissionHooks.php
+//todo: Restrict debug pages from showing debug if user is not a admin
+//todo: Can we make one function to render the GForm instead of writing that in each form hook?
+//todo: Change Pre Render to fill out form as it builds it, will now need to build the name and category fields as well- Partial
+//todo: Apply security to pages, if passed Record ID is not associated with the User ID of the logged in User, deny access
 
 //region Includes
 include_once ( __DIR__ . "/inc/inc.php" );
@@ -61,11 +65,16 @@ function ewim_form_settings() {
 function ewim_page_settings() {
 	require_once ( __DIR__ . "/inc/admin/pageSettings.php" );//Include Global Variables
 }
+//Page Settings
+function ewim_debug_settings() {
+	require_once ( __DIR__ . "/inc/admin/debugSettings.php" );//Include Global Variables
+}
 //Create menu pages
 function ewim_admin_actions() {
 	add_menu_page( 'EW Inventory Manager', 'Inventory Manager', 'manage_options', 'ewim', 'ewim_information');
 	add_submenu_page( 'ewim', 'Form Settings', 'Form Settings', 'manage_options', 'ewimFS', 'ewim_form_settings');
 	add_submenu_page( 'ewim', 'Page Settings', 'Page Settings', 'manage_options', 'ewimPS', 'ewim_page_settings');
+	add_submenu_page( 'ewim', 'Debug Settings', 'Debug Settings', 'manage_options', 'ewimDS', 'ewim_debug_settings');
 }
 //Create the Menus
 add_action('admin_menu', 'ewim_admin_actions');

@@ -12,5 +12,8 @@
 
 
 
-//Include Hooks
-include_once ( __DIR__ . "/gravityForms/_gravityFormsHooksInc.php" );
+global $pagenow;
+if($pagenow != 'post.php'){
+	//Include Hooks
+	include_once ( __DIR__ . "/gravityForms/_gravityFormsHooksInc.php" );
+}

@@ -93,7 +93,8 @@ function ewim_install_database($ewim_dbVersion=NULL){
 			category text,
 			item_meta text,
 			item_recipe_ingredients text,
-			item_inventory_quantity mediumint(9),	
+			item_inventory_quantity mediumint(9),
+			cost text,		
 	        UNIQUE KEY id (id),
 	        PRIMARY KEY id (id)
 	    )

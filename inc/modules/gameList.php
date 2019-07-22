@@ -25,6 +25,9 @@ $ewim_aGames= $wpdb->get_results("SELECT * FROM $ewim_tables->ewim_games WHERE u
 //region Get Max Games Allowed, display add game accordingly
 $ewim_userMaxGames= (get_user_meta($ewim_userID, 'max_games', true) == '' ? 2 : get_user_meta($ewim_userID, 'max_games', true));
 if($wpdb->num_rows < $ewim_userMaxGames){
+	//New Item Link
+	$ewim_gameFormPageURL= get_permalink(get_page_by_title($ewim_get_options->ewim_gameFormPage));
+	//endregion
 	$ewim_newGameLink= "<a href='$ewim_gameFormPageURL'><i class='fa fa-plus-circle' aria-hidden='true'></i></a>";
 }
 //endregion
@@ -80,9 +83,7 @@ $ewim_activateGameButton="
 $ewim_viewItemsLink= get_permalink(get_page_by_title($ewim_get_options->ewim_itemListPage));;
 $test= $ewim_get_options->ewim_itemListPage;
 
-//New Item Link
-$ewim_gameFormPageURL= get_permalink(get_page_by_title($ewim_get_options->ewim_gameFormPage));
-//endregion
+
 
 //Start Task 3: Angular Set Up
 $ewim_defaultOrderBy= 'name';

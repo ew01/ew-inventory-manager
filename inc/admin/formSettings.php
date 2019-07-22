@@ -11,7 +11,9 @@
 
 
 
-//todo update this page to use new systems, and use form names instead of form ids.
+//todo update this page to use new systems
+//todo I forgot what I meant by new systems, was it something to do with get options being in classes, does not seem like that is really needed for this page
+
 global $screen, $pagenow;
 
 if($_POST['ewim_submit'] == 'Y'){
@@ -22,14 +24,14 @@ if($_POST['ewim_submit'] == 'Y'){
 	$ewim_itemFormID= $_POST['ewim_itemFormID'];
 	update_option('ewim_itemFormID', $ewim_itemFormID);
 
+	$ewim_itemTransactionFormID= $_POST['ewim_itemTransactionFormID'];
+	update_option('ewim_itemTransactionFormID', $ewim_itemTransactionFormID);
+
+	$ewim_postedTransactionFormID= $_POST['ewim_postedTransactionFormID'];
+	update_option('ewim_postedTransactionFormID', $ewim_postedTransactionFormID);
+
 	$ewim_recipeFormID= $_POST['ewim_recipeFormID'];
 	update_option('ewim_recipeFormID', $ewim_recipeFormID);
-
-	$ewim_acquireFormID= $_POST['ewim_acquireFormID'];
-	update_option('ewim_acquireFormID', $ewim_acquireFormID);
-
-	$ewim_removeFormID= $_POST['ewim_removeFormID'];
-	update_option('ewim_removeFormID', $ewim_removeFormID);
 
 	$ewim_gameFormID= $_POST['ewim_gameFormID'];
 	update_option('ewim_gameFormID', $ewim_gameFormID);
@@ -51,15 +53,17 @@ else{
 	$ewim_displayMessage=    "none";
 
 	//region Form IDs
-	$ewim_itemFormID=       get_option('ewim_itemFormID');
-	$ewim_acquireFormID=     get_option('ewim_acquireFormID');
-	$ewim_gameFormPage=     get_option('ewim_gameFormPage');
-	$ewim_gameFormID=     get_option('ewim_gameFormID');
+	$ewim_itemFormID=                   get_option('ewim_itemFormID');
+	$ewim_itemTransactionFormID=        get_option('ewim_itemTransactionFormID');
+	$ewim_postedTransactionFormID=      get_option('ewim_postedTransactionFormID');
+
+	$ewim_gameFormPage=                 get_option('ewim_gameFormPage');
+	$ewim_gameFormID=                   get_option('ewim_gameFormID');
 	//endregion
 
     //region Form Pages
-	$ewim_itemFormPage=     get_option('ewim_itemFormPage');
-	$ewim_gameFormPage=   get_option('ewim_gameFormPage');
+	$ewim_itemFormPage=                 get_option('ewim_itemFormPage');
+	$ewim_gameFormPage=                 get_option('ewim_gameFormPage');
 	//endregion
 
 }
@@ -87,7 +91,25 @@ else{
                         <label for="ewim_itemFormID" style="width:200px;"><?= __("Item Form ID: ")?></label>
                     </th>
                     <td>
-                        <input id="ewim_itemFormID" name="ewim_itemFormID" type="text" value="<?= $ewim_itemFormID;?>" /><?= __("Example: 1")?>
+                        <input id="ewim_itemFormID" name="ewim_itemFormID" type="text" value="<?= $ewim_itemFormID;?>" /><?= __("Example: 5")?>
+                    </td>
+                </tr>
+                <!--Item Transaction Form-->
+                <tr>
+                    <th scope="row" align="left">
+                        <label for="ewim_itemTransactionFormID" style="width:200px;"><?= __("Item Transaction Form ID: ")?></label>
+                    </th>
+                    <td>
+                        <input id="ewim_itemTransactionFormID" name="ewim_itemTransactionFormID" type="text" value="<?= $ewim_itemTransactionFormID;?>" /><?= __("Example: 6")?>
+                    </td>
+                </tr>
+                <!--Posted Transaction Form-->
+                <tr>
+                    <th scope="row" align="left">
+                        <label for="ewim_postedTransactionFormID" style="width:200px;"><?= __("Posted Transaction Form ID: ")?></label>
+                    </th>
+                    <td>
+                        <input id="ewim_postedTransactionFormID" name="ewim_postedTransactionFormID" type="text" value="<?= $ewim_postedTransactionFormID;?>" /><?= __("Example: 9")?>
                     </td>
                 </tr>
                 <!--Game Form-->
