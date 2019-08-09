@@ -28,8 +28,8 @@ $ewim_activeGameSystem= get_user_meta($ewim_userID, 'active_game_system', true);
 //region Step 1: Get Item Information, decode where needed
 $ewim_aItem= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_items WHERE id = $ewim_itemID AND user_id = $ewim_userID",ARRAY_A);
 $ewim_gameID= $ewim_aItem['game_id'];
-$ewim_aItem['item_recipe_ingredients']= json_decode($ewim_aItem['item_recipe_ingredients'], true);
-$ewim_recipeCount= count($ewim_aItem['item_recipe_ingredients']);
+$ewim_aItem['design_details']= explode(",", $ewim_aItem['design_details']);
+$ewim_recipeCount= count($ewim_aItem['design_details']);
 //endregion
 
 //region Step 2: Organize the Item Information into usable Variables
@@ -54,40 +54,34 @@ switch ($ewim_aItem['category']){
 
 //region Switch Create the Correct Recipe Title
 switch ($ewim_aItem['category']){
-	case "Mineral":
-		$ewim_recipeOrMineralsTitle= "<th>Found in</th>";
+	case "Refined Resource":
+		//$ewim_recipeOrMineralsTitle= "<th>Found In</th>";
+		$ewim_recipeOrMineralsTitle= "<th></th>";
 		break;
-	case "Ore":
+	case "Raw Resource":
 		$ewim_recipeOrMineralsTitle= "<th>Contained Minerals</th>";
 		break;
 	case "Product":
-		$ewim_recipeOrMineralsTitle= "<th></th>";
+		$ewim_recipeOrMineralsTitle= "<th>Design Items</th>";
 		break;
-	case "Blueprint":
-		$ewim_recipeOrMineralsTitle= "<th>Recipe</th>";
-		break;
-	case "Blueprint Copy":
-		$ewim_recipeOrMineralsTitle= "<th>Recipe</th>";
+	case "Design Copy":
+		$ewim_recipeOrMineralsTitle= "<th>Design Items</th>";
 		break;
 }
 //endregion
 
 $ewim_recipeOrMinerals= "<td>";
 
-if($ewim_aItem['item_recipe_ingredients'] != ''){
+if($ewim_aItem['design_details'] != ''){
 	$ewim_itemDetailsPage= get_permalink(get_page_by_title($ewim_get_options->ewim_itemPage));
 
-	foreach($ewim_aItem['item_recipe_ingredients'] as $ewim_recipeItem => $ewim_recipeItemID){
+	//foreach($ewim_aItem['design_details'] as $ewim_recipeItem => $ewim_recipeItemID){
+	foreach($ewim_aItem['design_details'] as $ewim_designItem){
 		//todo get recipe items average cost, and display it. want to use other things to, possible calculate cost of item being made as well
-		/*
-		if($ewim_aItem['category'] == 'Blueprint'){
-			$ewim_aRecipeItem= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_items WHERE id = $ewim_recipeItemID",ARRAY_A);
-			//$ewim_recipeItem
-		}
-		*/
+		$ewim_aDesignItem= explode("_", $ewim_designItem);
 
+		$ewim_recipeOrMinerals.= "<a href='$ewim_itemDetailsPage?item_id=".$ewim_aDesignItem[1]."'>".$ewim_aDesignItem[0]."</a>, ";
 
-		$ewim_recipeOrMinerals.= "<a href='$ewim_itemDetailsPage?item_id=$ewim_recipeItemID'>$ewim_recipeItem</a>, ";
 	}
 	$ewim_recipeOrMinerals= substr($ewim_recipeOrMinerals, 0, -2);
 	$ewim_recipeOrMinerals.= "</td>";

@@ -39,15 +39,18 @@ else {
 
 		$ewim_aItem['item_inventory_quantity'] = number_format( $ewim_aItem['item_inventory_quantity'], 0, '.', ',' );
 
-		if ( $ewim_aItem['item_recipe_ingredients'] != '' ) {
+		if ( $ewim_aItem['design_details'] != '' ) {
 			$ewim_aItem['recipe'] = 'Yes, hover to see';
 			$ewim_aItem['recipe_items'];
 
-			$ewim_aItem['item_recipe_ingredients'] = json_decode( $ewim_aItem['item_recipe_ingredients'], true );
-			foreach ( $ewim_aItem['item_recipe_ingredients'] as $ewim_key => $ewim_value ) {
-				$ewim_aItem['recipe_items'] .= "$ewim_key, ";
+			$ewim_aItem['design_details'] = explode(",", $ewim_aItem['design_details']);
+
+			foreach ( $ewim_aItem['design_details'] as $ewim_value ) {
+				$ewim_aValue= explode('_',$ewim_value);
+				$ewim_aItem['recipe_items'].= $ewim_aValue[0].", ";
 			}
-			$ewim_aItem['recipe_items'] = substr( $ewim_aItem['recipe_items'], 0, - 2 );
+			$ewim_aItem['recipe_items'] = substr( $ewim_aItem['recipe_items'],0 ,-2 );
+
 		} else {
 			$ewim_aItem['recipe'] = 'No';
 		}
