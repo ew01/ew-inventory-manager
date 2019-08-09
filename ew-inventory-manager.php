@@ -16,6 +16,7 @@
 //todo: Can we make one function to render the GForm instead of writing that in each form hook?
 //todo: Change Pre Render to fill out form as it builds it, will now need to build the name and category fields as well- Partial
 //todo: Apply security to pages, if passed Record ID is not associated with the User ID of the logged in User, deny access
+//todo: Move Actions and their association with categories into meta data table
 
 //region Includes
 include_once ( __DIR__ . "/inc/inc.php" );

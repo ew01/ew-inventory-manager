@@ -620,7 +620,7 @@ function create_input_fields($ewim_oForm){
 				//endregion
 
 				//region Set min max for amount based on some params
-				if($ewim_action['text'] == 'Sell' || $ewim_action['text'] == 'Post' || $ewim_action['text'] == 'Manufacture' && $ewim_aItem['category'] == 'Blueprint Copy' ){
+				if($ewim_action['text'] == 'Sell' || $ewim_action['text'] == 'Post' || $ewim_action['text'] == 'Manufacture' && $ewim_aItem['category'] == 'Design Copy' ){
 					$ewim_oNewField->rangeMin= 0;
 					$ewim_oNewField->rangeMax= $ewim_aItem['item_inventory_quantity'];
 				}

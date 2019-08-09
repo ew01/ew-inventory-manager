@@ -94,6 +94,18 @@ function ewim_install_database_v_1_0_5($ewim_dbVersion=NULL){
 	unset($ewim_aInsert);
 	//endregion
 
+	//region Modify the Blueprint Copy to Design Copy
+	$ewim_aItems= $wpdb->get_results( "SELECT * FROM $ewim_tables->ewim_items WHERE category = 'Blueprint Copy'", ARRAY_A );//Find customer by location ID
+	$ewim_aInsert= array();
+	foreach($ewim_aItems as $ewim_aItem){
+		$ewim_aInsert= array(
+			'category'  =>  'Design Copy'
+		);
+		ewim_wpdb_edit('update',$ewim_tables->ewim_items,$ewim_aInsert,$ewim_aItem['id']);
+	}
+	unset($ewim_aInsert);
+	//endregion
+
 	//region Change the Meta Data from EVE named, to Default
 	$ewim_aMetaData= $wpdb->get_row( "SELECT * FROM $ewim_tables->ewim_meta_data WHERE meta_key = 'eve_item_actions'", ARRAY_A );//Find customer by location ID
 	$ewim_aInsert= array();
@@ -112,12 +124,10 @@ function ewim_install_database_v_1_0_5($ewim_dbVersion=NULL){
 
 	update_option( 'ewim_db_version', $ewim_dbVersion );
 }
-//calling the db install only on activation
-register_activation_hook( __FILE__, 'ewim_install_database' );
 
 //Calls install if db version has changed.
 function ewim_update_db_check_v_1_0_5() {
-	$ewim_dbVersion = '1.0.0';//db.table.field
+	$ewim_dbVersion = '1.0.1';//db.table.field
 	if ( get_option( 'ewim_db_version' ) < $ewim_dbVersion ) {
 		ewim_install_database_v_1_0_5($ewim_dbVersion);
 	}
