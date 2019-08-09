@@ -39,7 +39,7 @@ function ewim_master_pre_submission($ewim_oForm){
 	//endregion
 
 	//region Form Object Debug
-	if($ewim_debug_settings->ewim_formProcessEntry == 1){
+	if(1 == 0){
 		echo "<h1>Form Process | Form Entry</h1>";
 		echo "<pre>";
 		print_r($ewim_oForm);
@@ -148,20 +148,21 @@ function ewim_master_pre_submission($ewim_oForm){
 			}
 
 			//Ensure Game ID is set
-			$ewim_aInsert['game_id']= $ewim_activeGameID;
+			if($ewim_tableName != "ewim_games"){
+				$ewim_aInsert['game_id']= $ewim_activeGameID;
+			}
 			//endregion
 
 			//region Debug; Insert Array
-			//todo add if statement
-/*
-			echo "<pre>";
-			print_r($ewim_aInsert);
-			echo "</pre>";
-			echo "<pre>";
-			print_r($_POST);
-			echo "</pre>";
-			exit;
-*/
+			if(1 == 0){
+				echo "<pre>";
+				print_r($ewim_aInsert);
+				echo "</pre>";
+				echo "<pre>";
+				print_r($_POST);
+				echo "</pre>";
+				exit;
+			}
 			//endregion
 
 			//region Default Step 3: Call the SQL Edit Function, check for errors
