@@ -3,7 +3,7 @@
  * Plugin Name: EW Inventory Manager
  * Plugin URI: 
  * Description: Manage your inventory and average item cost
- * Version: 1.0.3
+ * Version: 1.0.5
  * Author: David Ellenburg II
  * Author URI: http://www.ellenburgweb.com
  * License: 
