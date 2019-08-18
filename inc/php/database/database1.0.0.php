@@ -29,7 +29,7 @@ function ewim_install_database($ewim_dbVersion=NULL){
 	//endregion
 
 	//region Create Meta Data Table
-	$pkc_sql= "
+	$ewim_sql= "
 		CREATE TABLE $ewim_tables->ewim_meta_data(
 			id mediumint(9) NOT NULL AUTO_INCREMENT,
 			meta_key text,
@@ -40,11 +40,11 @@ function ewim_install_database($ewim_dbVersion=NULL){
 		)
 		$charset_collate;
 	";
-	dbDelta($pkc_sql);
+	dbDelta($ewim_sql);
 	//endregion
 
 	//region Create Games Table
-	$pkc_sql="
+	$ewim_sql="
 		CREATE TABLE $ewim_tables->ewim_games (
 			id mediumint(9) NOT NULL AUTO_INCREMENT,
 			user_id mediumint(9),
@@ -56,11 +56,11 @@ function ewim_install_database($ewim_dbVersion=NULL){
 	    )
 	    $charset_collate;
 	";
-	dbDelta($pkc_sql);
+	dbDelta($ewim_sql);
 	//endregion
 
 	//region Create Ledger Table
-	$pkc_sql="
+	$ewim_sql="
 		CREATE TABLE $ewim_tables->ewim_ledger (
 			id mediumint(9) NOT NULL AUTO_INCREMENT,
 			user_id mediumint(9),
@@ -80,11 +80,11 @@ function ewim_install_database($ewim_dbVersion=NULL){
 	    )
 	    $charset_collate;
 	";
-	dbDelta($pkc_sql);
+	dbDelta($ewim_sql);
 	//endregion
 
 	//region Create Items Table
-	$pkc_sql="
+	$ewim_sql="
 		CREATE TABLE $ewim_tables->ewim_items (
 			id mediumint(9) NOT NULL AUTO_INCREMENT,
 			user_id mediumint(9),
@@ -100,11 +100,11 @@ function ewim_install_database($ewim_dbVersion=NULL){
 	    )
 	    $charset_collate;
 	";
-	dbDelta($pkc_sql);
+	dbDelta($ewim_sql);
 	//endregion
 
 	//region Create Posted Table
-	$pkc_sql="
+	$ewim_sql="
 		CREATE TABLE $ewim_tables->ewim_posted (
 			id mediumint(9) NOT NULL AUTO_INCREMENT,
 			user_id mediumint(9),
@@ -121,7 +121,7 @@ function ewim_install_database($ewim_dbVersion=NULL){
 	    )
 	    $charset_collate;
 	";
-	dbDelta($pkc_sql);
+	dbDelta($ewim_sql);
 	//endregion
 
 	update_option( 'ewim_db_version', $ewim_dbVersion );

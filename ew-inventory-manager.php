@@ -6,17 +6,24 @@
  * Version: 1.0.6
  * Author: David Ellenburg II
  * Author URI: http://www.ellenburgweb.com
- * License: 
+ * License:
+ * Form Versions: 2
  */
+
+//todo: ledger page, put total visible, average goes into tool tip
+//todo: Add form name to admin section for gformPreSubmissionHooks.php
+//todo: Can we make one function to render the GForm instead of writing that in each form hook? | Partially done
+//todo: Change Pre Render to fill out form as it builds it, will now need to build the name and category fields as well | Partial
+//todo: Apply security to pages, if passed Record ID is not associated with the User ID of the logged in User, deny access | Partial
+
+//todo: Upon review, we need to bring back the equivalent of the BPO, new item type of Design
 
 //todo: add ability to make a transaction that may not involve users items
 //todo: add a consume item action, should not have a negative balance since item is in inventory.
-//todo: Add form name to admin section for gformPreSubmissionHooks.php
 //todo: Restrict debug pages from showing debug if user is not a admin
-//todo: Can we make one function to render the GForm instead of writing that in each form hook?
-//todo: Change Pre Render to fill out form as it builds it, will now need to build the name and category fields as well- Partial
-//todo: Apply security to pages, if passed Record ID is not associated with the User ID of the logged in User, deny access
 //todo: Move Actions and their association with categories into meta data table
+//todo: We can call Gforms from code, do this everywhere so we can check to be sure item being edited belongs to the user
+//todo: Once Gform called from code is done, convert all buttons and links to divi button.
 
 //region Includes
 include_once ( __DIR__ . "/inc/inc.php" );
@@ -124,9 +131,27 @@ function ewim_page($ewim_parameters){
 add_shortcode( 'ewim', 'ewim_page');
 //endregion
 
+//region Version Shortcode
+function ewim_version(){
+	return "v1.0.6";
+}
+//Shortcode [ewim module='' page=''] or [ewim page='']
+add_shortcode( 'ewim_version', 'ewim_version');
+//endregion
+
 //region Redirect Based on User Role
 function login_redirect( /** @noinspection PhpUnusedParameterInspection */	$redirect_to, $request, $user ) {
-	return home_url();
+	//region Classes, Class Variables, Local Variables
+	$ewim_get_options= new ewim_get_options();
+	$ewim_current_user= wp_get_current_user();
+
+	$ewim_userID= $ewim_current_user->ID;
+	$ewim_activeGameID= get_user_meta($ewim_userID, 'active_game', true);
+	//endregion
+
+	$ewim_inventoriesPageURL= get_permalink(get_page_by_title($ewim_get_options->ewim_inventoriesPage));
+
+	return $ewim_inventoriesPageURL;
 	/*
 	//is there a user to check?
 	global $user;

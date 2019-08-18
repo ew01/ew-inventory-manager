@@ -32,8 +32,8 @@ if($_POST['ewim_submit'] == 'Y'){
 
     //region Forms
 
-	$ewim_formCreateEntry= $_POST['ewim_formCreateEntry'];
-	update_option('ewim_formCreateEntry', $ewim_formCreateEntry);
+	$ewim_CreateFieldsFormStart= $_POST['ewim_CreateFieldsFormStart'];
+	update_option('ewim_CreateFieldsFormStart', $ewim_CreateFieldsFormStart);
 
 	$ewim_formProcessEntry= $_POST['ewim_formProcessEntry'];
 	update_option('ewim_formProcessEntry', $ewim_formProcessEntry);
@@ -90,6 +90,13 @@ else{
 //endregion
 
 //region Forms
+if(get_option('ewim_CreateFieldsFormStart') == 1){
+	$ewim_CreateFieldsFormStartOn= 'checked';
+}
+else{
+	$ewim_CreateFieldsFormStartOff= 'checked';
+}
+
 if(get_option('ewim_formEntry') == 1){
 	$ewim_formEntryOn= 'checked';
 }
@@ -104,12 +111,7 @@ else{
 	$ewim_formExitOff= 'checked';
 }
 
-if(get_option('ewim_formCreateEntry') == 1){
-	$ewim_formCreateEntryOn= 'checked';
-}
-else{
-	$ewim_formCreateEntryOff= 'checked';
-}
+
 
 if(get_option('ewim_formProcessEntry') == 1){
 	$ewim_formProcessEntryOn= 'checked';
@@ -184,7 +186,20 @@ else{
                             <input id="ewim_wpdbError" name="ewim_wpdbError" type="radio" value="0" <?= $ewim_wpdbErrorOff; ?> /><?= __("Off")?>
                         </td>
                     </tr>
-					<!--Form Entry-->
+
+                    <!--Create Fields Form Start-->
+                    <tr>
+                        <th scope="row" align="left">
+                            <label for="ewim_CreateFieldsFormStart" style="width:200px;"><?= __("Create Fields Form Start: ")?></label>
+                        </th>
+                        <td>
+                            <input id="ewim_CreateFieldsFormStart" name="ewim_CreateFieldsFormStart" type="radio" value="1" <?= $ewim_CreateFieldsFormStartOn; ?> /><?= __("On")?>
+                            &nbsp;
+                            <input id="ewim_CreateFieldsFormStart" name="ewim_CreateFieldsFormStart" type="radio" value="0" <?= $ewim_CreateFieldsFormStartOff; ?> /><?= __("Off")?>
+                        </td>
+                    </tr>
+
+                    <!--Form Entry-->
 					<tr>
 						<th scope="row" align="left">
 							<label for="ewim_formEntry" style="width:200px;"><?= __("Form Entry Array: ")?></label>
@@ -206,17 +221,7 @@ else{
 							<input id="ewim_formExit" name="ewim_formExit" type="radio" value="0" <?= $ewim_formExitOff; ?> /><?= __("Off")?>
 						</td>
 					</tr>
-					<!--Form Create Entry-->
-					<tr>
-						<th scope="row" align="left">
-							<label for="ewim_formCreateEntry" style="width:200px;"><?= __("Form Create Entry Array: ")?></label>
-						</th>
-						<td>
-							<input id="ewim_formCreateEntry" name="ewim_formCreateEntry" type="radio" value="1" <?= $ewim_formCreateEntryOn; ?> /><?= __("On")?>
-							&nbsp;
-							<input id="ewim_formCreateEntry" name="ewim_formCreateEntry" type="radio" value="0" <?= $ewim_formCreateEntryOff; ?> /><?= __("Off")?>
-						</td>
-					</tr>
+
 					<!--Form Entry Process-->
 					<tr>
 						<th scope="row" align="left">

@@ -21,6 +21,9 @@ if($_POST['ewim_submit'] == 'Y'){
 	$ewim_displayMessage= "block";
 
 	//region Form IDs
+	$ewim_inventoryFormID= $_POST['ewim_inventoryFormID'];
+	update_option('ewim_inventoryFormID', $ewim_inventoryFormID);
+
 	$ewim_itemFormID= $_POST['ewim_itemFormID'];
 	update_option('ewim_itemFormID', $ewim_itemFormID);
 
@@ -33,19 +36,20 @@ if($_POST['ewim_submit'] == 'Y'){
 	$ewim_recipeFormID= $_POST['ewim_recipeFormID'];
 	update_option('ewim_recipeFormID', $ewim_recipeFormID);
 
-	$ewim_gameFormID= $_POST['ewim_gameFormID'];
-	update_option('ewim_gameFormID', $ewim_gameFormID);
+
     //endregion
 
 	//region Form Pages
+	$ewim_inventoryFormPage= $_POST['ewim_inventoryFormPage'];
+	update_option('ewim_inventoryFormPage', $ewim_inventoryFormPage);
+
 	$ewim_itemFormPage= $_POST['ewim_itemFormPage'];
 	update_option('ewim_itemFormPage', $ewim_itemFormPage);
 
 	$ewim_sellPostedFormPage= $_POST['ewim_sellPostedFormPage'];
 	update_option('ewim_sellPostedFormPage', $ewim_sellPostedFormPage);
 
-	$ewim_gameFormPage= $_POST['ewim_gameFormPage'];
-	update_option('ewim_gameFormPage', $ewim_gameFormPage);
+
 	//endregion
 }
 else{
@@ -53,17 +57,19 @@ else{
 	$ewim_displayMessage=    "none";
 
 	//region Form IDs
+	$ewim_inventoryFormID=                   get_option('ewim_inventoryFormID');
+
 	$ewim_itemFormID=                   get_option('ewim_itemFormID');
 	$ewim_itemTransactionFormID=        get_option('ewim_itemTransactionFormID');
 	$ewim_postedTransactionFormID=      get_option('ewim_postedTransactionFormID');
 
-	$ewim_gameFormPage=                 get_option('ewim_gameFormPage');
-	$ewim_gameFormID=                   get_option('ewim_gameFormID');
+	$ewim_inventoryFormPage=                 get_option('ewim_inventoryFormPage');
+
 	//endregion
 
     //region Form Pages
+	$ewim_inventoryFormPage=                 get_option('ewim_inventoryFormPage');
 	$ewim_itemFormPage=                 get_option('ewim_itemFormPage');
-	$ewim_gameFormPage=                 get_option('ewim_gameFormPage');
 	//endregion
 
 }
@@ -85,76 +91,83 @@ else{
             <h3><?=__("Form IDs")?></h3>
             <table class="table-form">
                 <tbody>
+                <!--Game Form-->
+                <tr>
+                    <th style="width:50%;text-align:left;">
+                        <label for="ewim_inventoryFormID" style="width:200px;"><?= __("Game Form ID: ")?></label>
+                    </th>
+                    <td>
+                        <input id="ewim_inventoryFormID" name="ewim_inventoryFormID" type="text" value="<?= $ewim_inventoryFormID;?>" /><?= __("Example: 1")?>
+                    </td>
+                </tr>
+
                 <!--Item Form-->
                 <tr>
-                    <th scope="row" align="left">
+                    <th style="width:50%;text-align:left;">
                         <label for="ewim_itemFormID" style="width:200px;"><?= __("Item Form ID: ")?></label>
                     </th>
                     <td>
                         <input id="ewim_itemFormID" name="ewim_itemFormID" type="text" value="<?= $ewim_itemFormID;?>" /><?= __("Example: 5")?>
                     </td>
                 </tr>
+
                 <!--Item Transaction Form-->
                 <tr>
-                    <th scope="row" align="left">
+                    <th style="width:50%;text-align:left;">
                         <label for="ewim_itemTransactionFormID" style="width:200px;"><?= __("Item Transaction Form ID: ")?></label>
                     </th>
                     <td>
                         <input id="ewim_itemTransactionFormID" name="ewim_itemTransactionFormID" type="text" value="<?= $ewim_itemTransactionFormID;?>" /><?= __("Example: 6")?>
                     </td>
                 </tr>
+
                 <!--Posted Transaction Form-->
                 <tr>
-                    <th scope="row" align="left">
+                    <th style="width:50%;text-align:left;">
                         <label for="ewim_postedTransactionFormID" style="width:200px;"><?= __("Posted Transaction Form ID: ")?></label>
                     </th>
                     <td>
                         <input id="ewim_postedTransactionFormID" name="ewim_postedTransactionFormID" type="text" value="<?= $ewim_postedTransactionFormID;?>" /><?= __("Example: 9")?>
                     </td>
                 </tr>
-                <!--Game Form-->
-                <tr>
-                    <th scope="row" align="left">
-                        <label for="ewim_gameFormID" style="width:200px;"><?= __("Remove Form ID: ")?></label>
-                    </th>
-                    <td>
-                        <input id="ewim_gameFormID" name="ewim_gameFormID" type="text" value="<?= $ewim_gameFormID;?>" /><?= __("Example: 1")?>
-                    </td>
-                </tr>
+
                 </tbody>
             </table>
-
-			<h3><?=__("Form Pages")?></h3>
-            <h4><?=__("Input Page Names")?></h4>
+        </div>
+        <div style="float: left;width: 50%">
+			<h3><?=__("Form Page Names")?></h3>
 			<table class="table-form">
 				<tbody>
+                <!--Game Form-->
+                <tr>
+                    <th style="width:50%;text-align:left;">
+                        <label for="ewim_inventoryFormPage" style="width:200px;"><?= __("Inventory Form Page: ")?></label>
+                    </th>
+                    <td>
+                        <input id="ewim_inventoryFormPage" name="ewim_inventoryFormPage" type="text" value="<?= $ewim_inventoryFormPage;?>" /><?= __("Example: Inventory Form")?>
+                    </td>
+                </tr>
+
 				<!--Item Form-->
 				<tr>
-					<th scope="row" align="left">
+					<th style="width:50%;text-align:left;">
 						<label for="ewim_itemFormPage" style="width:200px;"><?= __("Item Form Page: ")?></label>
 					</th>
 					<td>
 						<input id="ewim_itemFormPage" name="ewim_itemFormPage" type="text" value="<?= $ewim_itemFormPage;?>" /><?= __("Example: Item Form")?>
 					</td>
 				</tr>
+
                 <!--Sell Form-->
                 <tr>
-                    <th scope="row" align="left">
+                    <th style="width:50%;text-align:left;">
                         <label for="ewim_sellPostedFormPage" style="width:200px;"><?= __("Sell Posted Page: ")?></label>
                     </th>
                     <td>
                         <input id="ewim_sellPostedFormPage" name="ewim_sellPostedFormPage" type="text" value="<?= $ewim_sellPostedFormPage;?>" /><?= __("Example: Sell Posted")?>
                     </td>
                 </tr>
-                <!--Game Form-->
-                <tr>
-                    <th scope="row" align="left">
-                        <label for="ewim_gameFormPage" style="width:200px;"><?= __("Item Form Page: ")?></label>
-                    </th>
-                    <td>
-                        <input id="ewim_gameFormPage" name="ewim_gameFormPage" type="text" value="<?= $ewim_gameFormPage;?>" /><?= __("Example: Game Form")?>
-                    </td>
-                </tr>
+
 				</tbody>
 			</table>
 

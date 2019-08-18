@@ -12,7 +12,7 @@
 
 
 
-//add_action( 'show_user_profile', 'extra_user_profile_fields' );//User Level
+//add_action( 'show_user_profile', 'ewim_extra_user_profile_fields' );//User Level
 add_action( 'edit_user_profile', 'ewim_extra_user_profile_fields' );//Admin Level
 
 function ewim_extra_user_profile_fields( $user ) {
@@ -20,11 +20,11 @@ function ewim_extra_user_profile_fields( $user ) {
 	<h3><?php _e("Gaming Inventory Data", "blank"); ?></h3>
 
 	<table class="form-table">
-		<!--Max Games Allowed-->
+		<!--Max Inventories Allowed-->
 		<tr>
-			<th><label for="max_games"><?php _e("Max Games Allowed"); ?></label></th>
+			<th><label for="max_inventories"><?php _e("Max Inventories Allowed"); ?></label></th>
 			<td>
-				<input id="max_games" name="max_games" type="text" value="<?php echo esc_attr( get_the_author_meta( 'max_games', $user->ID ) ); ?>" class="regular-text" /><br />
+				<input id="max_inventories" name="max_inventories" type="text" value="<?php echo esc_attr( get_the_author_meta( 'max_inventories', $user->ID ) ); ?>" class="regular-text" /><br />
 				<!--<span class="description">< ?php _e("Please enter your address."); ?></span>-->
 			</td>
 		</tr>
@@ -50,14 +50,14 @@ function ewim_extra_user_profile_fields( $user ) {
 <?php
 }
 
-//add_action( 'personal_options_update', 'save_extra_user_profile_fields' );//User Level
+//add_action( 'personal_options_update', 'ewim_save_extra_user_profile_fields' );//User Level
 add_action( 'edit_user_profile_update', 'ewim_save_extra_user_profile_fields' );//Admin Level
 
 function ewim_save_extra_user_profile_fields( $user_id ) {
 	if ( !current_user_can( 'edit_user', $user_id ) ) {
 		return false;
 	}
-	update_user_meta( $user_id, 'max_games', $_POST['max_games'] );
+	update_user_meta( $user_id, 'max_inventories', $_POST['max_inventories'] );
 
 	/*
 	update_user_meta( $user_id, 'city', $_POST['city'] );

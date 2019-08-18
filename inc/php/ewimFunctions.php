@@ -85,9 +85,7 @@ function ewim_wpdb_edit($ewim_action, $ewim_table, $ewim_aInsert, $ewim_recordID
 /**
  * Name: EWIM Get Meta Value
  * Desc:
- *
  * @param $ewim_metaKey
- *
  * @return array
  */
 function ewim_get_meta_value($ewim_metaKey){
@@ -99,8 +97,39 @@ function ewim_get_meta_value($ewim_metaKey){
 	//endregion
 
 
-	$ewim_aCategoriesRecord= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_meta_data WHERE meta_key = '$ewim_metaKey'", ARRAY_A);
-	$ewim_aCategories= explode(',', $ewim_aCategoriesRecord['meta_value']);
+	$ewim_aMetaRecord= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_meta_data WHERE meta_key = '$ewim_metaKey'", ARRAY_A);
+	switch ($ewim_aMetaRecord['meta_value_type']){
+		case 'json':
+			$ewim_aMetaValues= json_decode($ewim_aMetaRecord['meta_value'], true);
+			break;
+		default:
+			$ewim_aMetaValues= explode(',', $ewim_aMetaRecord['meta_value']);
+			break;
+	}
 
-	return $ewim_aCategories;
+
+	return $ewim_aMetaValues;
+}
+
+/**
+ * Name: Do Math
+ */
+function ewim_do_math($ewim_operation, $ewim_valueOne, $ewim_aValues){
+	switch ($ewim_operation){
+		case "+":
+			$ewim_total= $ewim_valueOne;
+
+			foreach($ewim_aValues as $ewim_value){
+				$ewim_total= $ewim_total + $ewim_value;
+			}
+			break;
+		case "-":
+			$ewim_total= $ewim_valueOne;
+
+			foreach($ewim_aValues as $ewim_value){
+				$ewim_total= $ewim_total - $ewim_value;
+			}
+			break;
+	}
+	return $ewim_total;
 }

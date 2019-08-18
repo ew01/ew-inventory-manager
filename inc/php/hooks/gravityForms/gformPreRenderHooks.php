@@ -9,7 +9,7 @@
  */
 /** @noinspection PhpUndefinedVariableInspection */
 //todo: Look into turning all of this into a class
-
+//todo: More items can be moved out of the switch
 
 
 /**
@@ -31,7 +31,7 @@ function create_input_fields($ewim_oForm){
 	$ewim_current_user= wp_get_current_user();
 
 	$ewim_userID= $ewim_current_user->ID;
-	$ewim_activeGameID= get_user_meta($ewim_userID, 'active_game', true);
+	$ewim_activeInventoryID= get_user_meta($ewim_userID, 'active_inventory', true);
 	//endregion
 
 	//region Debug: Form Start
@@ -46,64 +46,294 @@ function create_input_fields($ewim_oForm){
 
 	//region Step 1: Get record ID if passed. If we get a record id we get the record so we can fill out the form
 	if(isset($_REQUEST['record_id']) and $_REQUEST['record_id'] != '') {
+		$ewim_inventoryID= $_REQUEST['record_id'];
+		$ewim_aInventory= $wpdb->get_row( "SELECT * FROM $ewim_tables->ewim_games WHERE id = '$ewim_inventoryID'", ARRAY_A );
+	}
+
+	if(isset($_REQUEST['record_id']) and $_REQUEST['record_id'] != '') {
 		$ewim_itemID= $_REQUEST['record_id'];
 		$ewim_aItem= $wpdb->get_row( "SELECT * FROM $ewim_tables->ewim_items WHERE id = '$ewim_itemID'", ARRAY_A );
+		if(1 == 0){
+			echo "<pre>";
+			print_r($ewim_aItem);
+			echo "</pre>";
+		}
 	}
+	//endregion
+
+	//region Loop Fields. Get any template fields, and find id fields for conditional logic
+	$ewim_fieldCount= 0;//This count is for the array element of the fields in the form array
+	foreach ($ewim_oForm['fields'] as &$ewim_oField){
+		if($ewim_oField->adminLabel == 'single_line_text_template'){
+			$ewim_oSingleLineTextFieldTemplate= clone $ewim_oField;
+		}
+		if($ewim_oField->adminLabel == 'radio_template'){
+			$ewim_oRadioFieldTemplate= clone $ewim_oField;
+		}
+		if($ewim_oField->adminLabel == 'number_template'){
+			$ewim_oNumberFieldTemplate= clone $ewim_oField;
+		}
+		if($ewim_oField->type == 'section'){
+			$ewim_oSectionFieldTemplate= $ewim_oField;
+		}
+		if($ewim_oField->adminLabel == 'drop_down_template'){
+			$ewim_oDropDownFieldTemplate= clone $ewim_oField;
+		}
+		if($ewim_oField->adminLabel == 'checkbox_template'){
+			$ewim_oCheckboxFieldTemplate= clone $ewim_oField;
+		}
+		$ewim_fieldCount++;
+	}
+	//endregion
+
+	//region Set starting values for variables changed/increased by loop
+	$ewim_fieldCSS= 'gf_left_half';//Sets the starting CSS Class for new fields
+	$ewim_itemCount= 1;
+	$ewim_fieldID= 1000;
 	//endregion
 
 	//region Step 2: Switch to processor based on Form ID
 	switch ($ewim_oForm['id']){
+		case $ewim_getOptions->ewim_inventoryFormID:
+
+			//region Form Variables
+			$ewim_aCurrencies= json_decode($ewim_aInventory['inventory_currencies'], true);
+			//endregion
+
+			//region Create and Label Fields
+
+			//region Inventory Name; Single Line Text Field
+			$ewim_oNewField= clone $ewim_oSingleLineTextFieldTemplate;
+			$ewim_oNewField->label= 'Inventory Name';//Display Label
+			$ewim_oNewField->adminLabel= 'inventory_name';//Backend Label
+			$ewim_oNewField->inputName= 'inventory_name';//Pre Populate Label
+			$ewim_oNewField->visibility= 'visible';
+			$ewim_oNewField->id= $ewim_fieldID;
+			$ewim_oNewField->isRequired= 1;
+			$ewim_oNewField->cssClass= 'ewim_dbField';
+			$ewim_oNewField->defaultValue= (isset($ewim_inventoryID) ? $ewim_aInventory['inventory_name'] : '');
+
+			//Push our new field object into the form object
+			$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewField;
+
+			//Increase Counts
+			$ewim_fieldCount++;
+			$ewim_fieldID++;
+			//endregion
+
+			//region Inventory Currency System; Drop Down Field
+			$ewim_oNewField= clone $ewim_oDropDownFieldTemplate;
+			$ewim_oNewField->label= 'Currency System';
+			$ewim_oNewField->adminLabel= 'inventory_currency_system';
+			$ewim_oNewField->inputName= 'inventory_currency_system';
+			$ewim_oNewField->visibility= 'visible';
+			$ewim_oNewField->id= $ewim_inventoryCurrencyStyleFieldID= $ewim_fieldID;
+			$ewim_oNewField->isRequired= 1;
+			$ewim_oNewField->cssClass= 'ewim_dbField';
+			$ewim_oNewField->placeholder= 'Select One';
+
+			$ewim_choicesCount= 0;
+			$ewim_aInventoryCurrencyStyles= ewim_get_meta_value('default_currency_styles');
+			foreach($ewim_aInventoryCurrencyStyles as $ewim_currencyStyleKey => $ewim_currencyStyleValue){
+				$ewim_oNewField->choices[$ewim_choicesCount]= array(
+					'text'  => $ewim_currencyStyleKey,
+					'value' => $ewim_currencyStyleKey
+				);
+				$ewim_choicesCount++;
+			}
+
+			$ewim_oNewField->defaultValue= (isset($ewim_inventoryID) ? $ewim_aInventory['inventory_currency_system'] : '');
+
+			//Place New Field into Form
+			$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewField;
+
+			//Increase Counters
+			$ewim_fieldCount++;
+			$ewim_itemCount++;
+			$ewim_fieldID++;
+
+			//endregion
+
+			//region Single Currency System; Section
+			$ewim_oNewSection= clone $ewim_oSectionFieldTemplate;
+			$ewim_oNewSection->label= 'Please Label your Currency';
+			$ewim_oNewSection->visibility= 'visible';
+			$ewim_oNewSection->id= $ewim_fieldID;
+			$ewim_oNewSection->description= $ewim_aInventoryCurrencyStyles['Single Currency System'];
+			$ewim_oNewSection->conditionalLogic= array(
+				'actionType'    => 'show',
+				'logicType'     => 'any',
+				'rules'         => array(
+					array(
+						'fieldId'   => $ewim_inventoryCurrencyStyleFieldID,
+						'operator'  => 'is',
+						'value'     => 'Single Currency System'
+					)
+				)
+			);
+			$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewSection;//Push our new field object into the form object
+			$ewim_fieldCount++;
+			$ewim_fieldID++;
+			//endregion
+
+			//region Single Currency System; Single Line Text Field
+			$ewim_oNewField= clone $ewim_oSingleLineTextFieldTemplate;
+			$ewim_oNewField->label= 'Currency Name';//Display Label
+			$ewim_oNewField->adminLabel= 'inventory_currency';//Backend Label
+			$ewim_oNewField->inputName= 'inventory_currency';//Pre Populate Label
+			$ewim_oNewField->visibility= 'visible';
+			$ewim_oNewField->id= $ewim_fieldID;
+			$ewim_oNewField->isRequired= 1;
+			$ewim_oNewField->cssClass= 'currency';
+			$ewim_oNewField->conditionalLogic= array(
+				'actionType'    => 'show',
+				'logicType'     => 'any',
+				'rules'         => array(
+					array(
+						'fieldId'   => $ewim_inventoryCurrencyStyleFieldID,
+						'operator'  => 'is',
+						'value'     => 'Single Currency System'
+					)
+				)
+			);
+
+			$ewim_oNewField->defaultValue= (isset($ewim_inventoryID) ? $ewim_aCurrencies['inventory_currency'] : '');
+
+			//Push our new field object into the form object
+			$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewField;
+
+			//Increase Counts
+			$ewim_fieldCount++;
+			$ewim_fieldID++;
+			//endregion
+
+			//region Triple Currency System; Section
+			$ewim_oNewSection= clone $ewim_oSectionFieldTemplate;
+			$ewim_oNewSection->label= 'Please Label your Currency';
+			$ewim_oNewSection->visibility= 'visible';
+			$ewim_oNewSection->id= $ewim_fieldID;
+			$ewim_oNewSection->description= $ewim_aInventoryCurrencyStyles['Triple Currency System'];
+			$ewim_oNewSection->conditionalLogic= array(
+				'actionType'    => 'show',
+				'logicType'     => 'any',
+				'rules'         => array(
+					array(
+						'fieldId'   => $ewim_inventoryCurrencyStyleFieldID,
+						'operator'  => 'is',
+						'value'     => 'Triple Currency System'
+					)
+				)
+			);
+			$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewSection;//Push our new field object into the form object
+			$ewim_fieldCount++;
+			$ewim_fieldID++;
+			//endregion
+
+			//region Triple Currency System; Single Line Text Field
+
+			//region First Currency
+			$ewim_oNewField= clone $ewim_oSingleLineTextFieldTemplate;
+			$ewim_oNewField->label= 'First Currency Name';//Display Label
+			$ewim_oNewField->adminLabel= 'tc_first_currency';//Backend Label
+			$ewim_oNewField->inputName= 'tc_first_currency';//Pre Populate Label
+			$ewim_oNewField->visibility= 'visible';
+			$ewim_oNewField->id= $ewim_fieldID;
+			$ewim_oNewField->isRequired= 1;
+			$ewim_oNewField->cssClass= 'currency';
+			$ewim_oNewField->conditionalLogic= array(
+				'actionType'    => 'show',
+				'logicType'     => 'any',
+				'rules'         => array(
+					array(
+						'fieldId'   => $ewim_inventoryCurrencyStyleFieldID,
+						'operator'  => 'is',
+						'value'     => 'Triple Currency System'
+					)
+				)
+			);
+			$ewim_oNewField->defaultValue= (isset($ewim_inventoryID) ? $ewim_aCurrencies['tc_first_currency'] : '');
+			//Push our new field object into the form object
+			$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewField;
+
+			//Increase Counts
+			$ewim_fieldCount++;
+			$ewim_fieldID++;
+			//endregion
+
+			//region Second Currency
+			$ewim_oNewField= clone $ewim_oSingleLineTextFieldTemplate;
+			$ewim_oNewField->label= 'Second Currency Name';//Display Label
+			$ewim_oNewField->adminLabel= 'tc_second_currency';//Backend Label
+			$ewim_oNewField->inputName= 'tc_second_currency';//Pre Populate Label
+			$ewim_oNewField->visibility= 'visible';
+			$ewim_oNewField->id= $ewim_fieldID;
+			$ewim_oNewField->isRequired= 1;
+			$ewim_oNewField->cssClass= 'currency';
+			$ewim_oNewField->conditionalLogic= array(
+				'actionType'    => 'show',
+				'logicType'     => 'any',
+				'rules'         => array(
+					array(
+						'fieldId'   => $ewim_inventoryCurrencyStyleFieldID,
+						'operator'  => 'is',
+						'value'     => 'Triple Currency System'
+					)
+				)
+			);
+			$ewim_oNewField->defaultValue= (isset($ewim_inventoryID) ? $ewim_aCurrencies['tc_second_currency'] : '');
+
+			//Push our new field object into the form object
+			$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewField;
+
+			//Increase Counts
+			$ewim_fieldCount++;
+			$ewim_fieldID++;
+			//endregion
+
+			//region Third Currency
+			$ewim_oNewField= clone $ewim_oSingleLineTextFieldTemplate;
+			$ewim_oNewField->label= 'Third Currency Name';//Display Label
+			$ewim_oNewField->adminLabel= 'tc_third_currency';//Backend Label
+			$ewim_oNewField->inputName= 'tc_third_currency';//Pre Populate Label
+			$ewim_oNewField->visibility= 'visible';
+			$ewim_oNewField->id= $ewim_fieldID;
+			$ewim_oNewField->isRequired= 1;
+			$ewim_oNewField->cssClass= 'currency';
+			$ewim_oNewField->conditionalLogic= array(
+				'actionType'    => 'show',
+				'logicType'     => 'any',
+				'rules'         => array(
+					array(
+						'fieldId'   => $ewim_inventoryCurrencyStyleFieldID,
+						'operator'  => 'is',
+						'value'     => 'Triple Currency System'
+					)
+				)
+			);
+			$ewim_oNewField->defaultValue= (isset($ewim_inventoryID) ? $ewim_aCurrencies['tc_third_currency'] : '');
+
+			//Push our new field object into the form object
+			$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewField;
+
+			//Increase Counts
+			$ewim_fieldCount++;
+			$ewim_fieldID++;
+			//endregion
+
+			//endregion
+
+			//endregion
+
+			break;
 		case $ewim_getOptions->ewim_itemFormID:
+			//region Get Options
+			$ewim_categoryList= 'default_item_categories';
+			$ewim_aCategories= ewim_get_meta_value($ewim_categoryList);
+			//endregion
+
 			//region Get the game system, set game system variables
-			$ewim_aGame= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_games WHERE id = $ewim_activeGameID",ARRAY_A);
+			$ewim_aGame= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_games WHERE id = $ewim_activeInventoryID",ARRAY_A);
 
-			switch ($ewim_aGame['game_system']){
-				case 'EVE':
-					$ewim_categoryList= 'default_item_categories';
-					$ewim_aCategories= ewim_get_meta_value($ewim_categoryList);
-					break;
-				case 'DND':
-					$ewim_categoryList= 'default_item_categories';
-					$ewim_aCategories= ewim_get_meta_value($ewim_categoryList);
-					break;
-				default:
-					$ewim_categoryList= 'default_item_categories';
-					$ewim_aCategories= ewim_get_meta_value($ewim_categoryList);
-					break;
-			}
-			//endregion
-
-			//region Loop Fields. Get any template fields, and find id fields for conditional logic
-			$ewim_fieldCount= 0;//This count is for the array element of the fields in the form array
-			foreach ($ewim_oForm['fields'] as &$ewim_oField){
-				if($ewim_oField->adminLabel == 'single_line_text_template'){
-					$ewim_oSingleLineTextFieldTemplate= clone $ewim_oField;
-				}
-				if($ewim_oField->adminLabel == 'radio_template'){
-					$ewim_oRadioFieldTemplate= clone $ewim_oField;
-				}
-				//todo this may get used for recipe amounts
-				/*if($ewim_oField->adminLabel == 'number_template'){
-					$ewim_oNumberFieldTemplate= clone $ewim_oField;
-				}*/
-				if($ewim_oField->type == 'section'){
-					$ewim_oSectionFieldTemplate= $ewim_oField;
-				}
-				if($ewim_oField->adminLabel == 'drop_down_template'){
-					$ewim_oDropDownFieldTemplate= clone $ewim_oField;
-				}
-				if($ewim_oField->adminLabel == 'checkbox_template'){
-					$ewim_oCheckboxFieldTemplate= clone $ewim_oField;
-				}
-
-
-				$ewim_fieldCount++;
-			}
-			//endregion
-
-			//region Set starting values for variables changed/increased by loop
-			$ewim_itemCount= 1;
-			$ewim_fieldID= 1000;
 			//endregion
 
 			//region Create and Label Fields
@@ -279,7 +509,7 @@ function create_input_fields($ewim_oForm){
 			$ewim_oNewField->id= $ewim_fieldID;//Give it an id
 			//$ewim_oNewField->isRequired= 1;
 
-			$ewim_aRefinedResources= $wpdb->get_results("SELECT * FROM $ewim_tables->ewim_items WHERE game_id = $ewim_activeGameID AND category = 'Refined Resource' ORDER BY item_name",ARRAY_A);
+			$ewim_aRefinedResources= $wpdb->get_results("SELECT * FROM $ewim_tables->ewim_items WHERE game_id = $ewim_activeInventoryID AND category = 'Refined Resource' ORDER BY item_name",ARRAY_A);
 
 			$ewim_aDesign= (isset($ewim_itemID) ? explode(',',$ewim_aItem['design_details']) : array());
 
@@ -356,7 +586,7 @@ function create_input_fields($ewim_oForm){
 			$ewim_oNewField->id= $ewim_fieldID;//Give it an id
 			//$ewim_oNewField->isRequired= 1;
 
-			$ewim_aComponents= $wpdb->get_results("SELECT * FROM $ewim_tables->ewim_items WHERE game_id = $ewim_activeGameID AND category = 'Component' ORDER BY item_name",ARRAY_A);
+			$ewim_aComponents= $wpdb->get_results("SELECT * FROM $ewim_tables->ewim_items WHERE game_id = $ewim_activeInventoryID AND category = 'Component' ORDER BY item_name",ARRAY_A);
 
 			$ewim_aDesign= (isset($ewim_itemID) ? explode(',',$ewim_aItem['design_details']) : array());
 
@@ -397,80 +627,32 @@ function create_input_fields($ewim_oForm){
 			//endregion
 
 			//endregion
+
 			break;
 		case $ewim_getOptions->ewim_itemTransactionFormID:
-			//region Global Variables, Classes, Class Variables, Local Variables
-			$ewim_fieldCSS= 'gf_left_half';//Sets the starting CSS Class for new fields
-			$ewim_itemCount= 1;
-			$ewim_fieldID= 1000;//Sets the Starting Field ID for New fields
-			//endregion
-
 			//todo consume action
 			//todo percentage for sells
 			//todo posting option, fee field, figure way to calculate fee when item sales, new table field?
 
 			//region Item Adjust Form Step 1: Get the game system, set game system variables
-			$ewim_aGame= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_games WHERE id = $ewim_activeGameID",ARRAY_A);
+			$ewim_aInventory= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_games WHERE id = $ewim_activeInventoryID",ARRAY_A);
+			$ewim_aInventory['inventory_currencies']= json_decode($ewim_aInventory['inventory_currencies'], true);
 
-			switch ($ewim_aGame['game_system']){
-				case 'EVE':
-					//$ewim_categoryList= 'default_item_categories';
-					//$ewim_aCategories= ewim_get_meta_value($ewim_categoryList);
-					//$ewim_itemActionList= 'default_item_actions';
-					//$ewim_aCategories= ewim_get_meta_value($ewim_categoryList);
-					$ewim_aCoinage= array(
-						'ISK'
+			switch ($ewim_aInventory['inventory_currency_system']){
+				case "Singe Currency System":
+					$ewim_aInventoryCurrencies= array(
+						$ewim_aInventory['inventory_currencies']['inventory_currency']
 					);
 					break;
-				case 'DND':
-					//$ewim_categoryList= 'default_item_categories';
-					//$ewim_aCategories= ewim_get_meta_value($ewim_categoryList);
-					//$ewim_itemActionList= 'default_item_actions';
-					//$ewim_aCategories= ewim_get_meta_value($ewim_categoryList);
-					$ewim_aCoinage= array(
-						'Copper',
-						'Silver',
-						'Gold'
-					);
-					break;
-				default:
-					//$ewim_categoryList= 'default_item_categories';
-					//$ewim_aCategories= ewim_get_meta_value($ewim_categoryList);
-					//$ewim_itemActionList= 'default_item_actions';
-					//$ewim_aCategories= ewim_get_meta_value($ewim_categoryList);
-					$ewim_aCoinage= array(
-						'Credit'
-					);
+				case "Triple Currency System":
+					$ewim_aInventoryCurrencies[0]= $ewim_aInventory['inventory_currencies']['tc_first_currency'];
+					$ewim_aInventoryCurrencies[1]= $ewim_aInventory['inventory_currencies']['tc_second_currency'];
+					$ewim_aInventoryCurrencies[2]= $ewim_aInventory['inventory_currencies']['tc_third_currency'];
 					break;
 			}
 			//endregion
 
-			//region Item Adjust Form Step 2: Loop Fields. Get any template fields, and find id fields for conditional logic
-			$ewim_fieldCount= 0;//This is the field array index in the field array of the form object
-			foreach ($ewim_oForm['fields'] as &$ewim_oField){
-				if($ewim_oField->adminLabel == 'number_template'){
-					$ewim_oNumberFieldTemplate= clone $ewim_oField;
-				}
-				if($ewim_oField->adminLabel == 'drop_down_template'){
-					$ewim_oDropDownFieldTemplate= clone $ewim_oField;
-				}
-				/*
-				if($ewim_oField->adminLabel == 'action'){
-					$ewim_actionFieldID= $ewim_oField->id;
-				}
-				*/
-				if($ewim_oField->type == 'section'){
-					$ewim_oSectionFieldTemplate= $ewim_oField;
-				}
-				$ewim_fieldCount++;
-			}
-			//endregion
-
-			//region Item Adjust Form Step 3: Get Current Item and its Design, create Appropriate Action Drop Down
-			$ewim_itemID= $_REQUEST['item_id'];
-			$ewim_aItem= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_items WHERE id = $ewim_itemID",ARRAY_A);
-
-			//Get Item Category, create Action Array
+			//region Appropriate Action List; Drop Down
 			//todo add more meta values to db, get and add like we do categories
 			switch ($ewim_aItem['category']){
 				case "Product":
@@ -479,10 +661,11 @@ function create_input_fields($ewim_oForm){
 							'text'  => 'Buy',
 							'value' => 'Buy'
 						),
+						/*
 						array(
 							'text'  => 'Post',
 							'value' => 'Post'
-						),
+						),*/
 						array(
 							'text'  => 'Sell',
 							'value' => 'Sell'
@@ -503,10 +686,10 @@ function create_input_fields($ewim_oForm){
 							'text'  => 'Buy',
 							'value' => 'Buy'
 						),
-						array(
+						/*array(
 							'text'  => 'Post',
 							'value' => 'Post'
-						),
+						),*/
 						array(
 							'text'  => 'Sell',
 							'value' => 'Sell'
@@ -527,10 +710,10 @@ function create_input_fields($ewim_oForm){
 							'text'  => 'Buy',
 							'value' => 'Buy'
 						),
-						array(
+						/*array(
 							'text'  => 'Post',
 							'value' => 'Post'
-						),
+						),*/
 						array(
 							'text'  => 'Sell',
 							'value' => 'Sell'
@@ -547,10 +730,10 @@ function create_input_fields($ewim_oForm){
 							'text'  => 'Buy',
 							'value' => 'Buy'
 						),
-						array(
+						/*array(
 							'text'  => 'Post',
 							'value' => 'Post'
-						),
+						),*/
 						array(
 							'text'  => 'Sell',
 							'value' => 'Sell'
@@ -563,10 +746,10 @@ function create_input_fields($ewim_oForm){
 							'text'  => 'Buy',
 							'value' => 'Buy'
 						),
-						array(
+						/*array(
 							'text'  => 'Post',
 							'value' => 'Post'
-						),
+						),*/
 						array(
 							'text'  => 'Sell',
 							'value' => 'Sell'
@@ -582,8 +765,17 @@ function create_input_fields($ewim_oForm){
 					);
 					break;
 				default:
-					$ewim_aActionsRecord= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_meta_data WHERE meta_key = 'eve_item_actions'",ARRAY_A);
-					$ewim_aActions= explode(",", $ewim_aActionsRecord['meta_value']);
+					$ewim_aActionsRecord= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_meta_data WHERE meta_key = 'default_item_actions'",ARRAY_A);
+					$ewim_aActionRecord= explode(",", $ewim_aActionsRecord['meta_value']);
+					$ewim_actionCount= 0;
+					foreach($ewim_aActionRecord as $ewim_action){
+						$ewim_aActions[$ewim_actionCount]= array(
+							'text'  => $ewim_action,
+							'value' => $ewim_action
+						);
+						$ewim_actionCount++;
+					}
+
 					break;
 			}
 
@@ -592,8 +784,8 @@ function create_input_fields($ewim_oForm){
 			$ewim_oNewField->adminLabel= 'action';
 			$ewim_oNewField->visibility= 'visible';
 			$ewim_oNewField->id= $ewim_actionFieldID= $ewim_fieldID;
-			$ewim_oNewField->choices= $ewim_aActions;
 			$ewim_oNewField->isRequired= 0;
+			$ewim_oNewField->choices= $ewim_aActions;
 			$ewim_oNewField->defaultValue= 0;
 			//Place New Field into Form
 			$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewField;
@@ -676,235 +868,380 @@ function create_input_fields($ewim_oForm){
 			//endregion
 
 			//region Item Adjust Form Step 5: Create Coin Fields
-			foreach($ewim_aCoinage as $ewim_coin){
-				$ewim_oNewField= clone $ewim_oNumberFieldTemplate;
-				$ewim_oNewField->label= "Total ".$ewim_coin;
-				$ewim_oNewField->adminLabel= $ewim_coin;
-				$ewim_oNewField->visibility= 'visible';
-				$ewim_oNewField->cssClass= $ewim_fieldCSS;
-				$ewim_oNewField->id= $ewim_fieldID;
-				$ewim_oNewField->conditionalLogic= array(
-					'actionType'    => 'show',
-					'logicType'     => 'any',
-					'rules'         => array(
-						array(
-							'fieldId'   => $ewim_actionFieldID,
-							'operator'  => 'is',
-							'value'     => 'Buy'
+			switch ($ewim_aInventory['inventory_currency_system']){
+				case "Single Currency System":
+					$ewim_aFieldDetails= array(
+						'label'             => 'Total '.$ewim_aInventory['inventory_currencies']['inventory_currency'],
+						'adminLabel'        => 'inventory_currency',
+						'visibility'        => 'visible',
+						'cssClass'          => $ewim_fieldCSS,
+						'id'                => $ewim_fieldID,
+						'conditionalLogic'  => array(
+							'actionType'    => 'show',
+							'logicType'     => 'any',
+							'rules'         => array(
+								array(
+									'fieldId'   => $ewim_actionFieldID,
+									'operator'  => 'is',
+									'value'     => 'Buy'
+								),
+								array(
+									'fieldId'   => $ewim_actionFieldID,
+									'operator'  => 'is',
+									'value'     => 'Sell'
+								)
+							)
 						),
-						array(
-							'fieldId'   => $ewim_actionFieldID,
-							'operator'  => 'is',
-							'value'     => 'Sell'
-						)
-					)
-				);
-				$ewim_oNewField->isRequired= 0;
-				$ewim_oNewField->defaultValue= 0;
+						'isRequired'        => 0,
+						'defaultValue'      => 0
+					);
 
-				//Place New Field into Form
-				$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewField;
+					$ewim_ewim_gform_field_creator= new ewim_gform_field_creator();
 
-				//Increase Counters
-				$ewim_fieldCount++;
-				$ewim_itemCount++;
-				$ewim_fieldID++;
+					$ewim_oNewNumberField= $ewim_ewim_gform_field_creator->number_field($ewim_aFieldDetails, $ewim_oNumberFieldTemplate);
 
-				//Alternate to next CSS Class
-				$ewim_fieldCSS= ($ewim_fieldCount / 2 ? 'gf_right_half' : 'gf_left_half');
+					$ewim_oForm['fields'][$ewim_fieldCount]= $ewim_oNewNumberField;
+
+					//Increase Counters
+					$ewim_fieldCount++;
+					$ewim_itemCount++;
+					$ewim_fieldID++;
+
+					//Alternate to next CSS Class
+					$ewim_fieldCSS= ($ewim_fieldCount / 2 ? 'gf_right_half' : 'gf_left_half');
+
+					break;
+				case "Triple Currency System":
+					//region First Currency
+					$ewim_aFieldDetails= array(
+						'label'             => 'Total '.$ewim_aInventory['inventory_currencies']['tc_first_currency'],
+						'adminLabel'        => 'tc_first_currency',
+						'visibility'        => 'visible',
+						'cssClass'          => $ewim_fieldCSS,
+						'id'                => $ewim_fieldID,
+						'conditionalLogic'  => array(
+							'actionType'    => 'show',
+							'logicType'     => 'any',
+							'rules'         => array(
+								array(
+									'fieldId'   => $ewim_actionFieldID,
+									'operator'  => 'is',
+									'value'     => 'Buy'
+								),
+								array(
+									'fieldId'   => $ewim_actionFieldID,
+									'operator'  => 'is',
+									'value'     => 'Sell'
+								)
+							)
+						),
+						'isRequired'        => 0,
+						'defaultValue'      => 0
+					);
+
+					$ewim_ewim_gform_field_creator= new ewim_gform_field_creator();
+
+					$ewim_oNewNumberField= $ewim_ewim_gform_field_creator->number_field($ewim_aFieldDetails, $ewim_oNumberFieldTemplate);
+
+					$ewim_oForm['fields'][$ewim_fieldCount]= $ewim_oNewNumberField;
+
+					//Increase Counters
+					$ewim_fieldCount++;
+					$ewim_itemCount++;
+					$ewim_fieldID++;
+
+					//Alternate to next CSS Class
+					$ewim_fieldCSS= ($ewim_fieldCount / 2 ? 'gf_right_half' : 'gf_left_half');
+					//endregion
+
+					//region Second Currency
+					$ewim_aFieldDetails= array(
+						'label'             => 'Total '.$ewim_aInventory['inventory_currencies']['tc_second_currency'],
+						'adminLabel'        => 'tc_second_currency',
+						'visibility'        => 'visible',
+						'cssClass'          => $ewim_fieldCSS,
+						'id'                => $ewim_fieldID,
+						'conditionalLogic'  => array(
+							'actionType'    => 'show',
+							'logicType'     => 'any',
+							'rules'         => array(
+								array(
+									'fieldId'   => $ewim_actionFieldID,
+									'operator'  => 'is',
+									'value'     => 'Buy'
+								),
+								array(
+									'fieldId'   => $ewim_actionFieldID,
+									'operator'  => 'is',
+									'value'     => 'Sell'
+								)
+							)
+						),
+						'isRequired'        => 0,
+						'defaultValue'      => 0
+					);
+
+					$ewim_ewim_gform_field_creator= new ewim_gform_field_creator();
+
+					$ewim_oNewNumberField= $ewim_ewim_gform_field_creator->number_field($ewim_aFieldDetails, $ewim_oNumberFieldTemplate);
+
+					$ewim_oForm['fields'][$ewim_fieldCount]= $ewim_oNewNumberField;
+
+					//Increase Counters
+					$ewim_fieldCount++;
+					$ewim_itemCount++;
+					$ewim_fieldID++;
+
+					//Alternate to next CSS Class
+					$ewim_fieldCSS= ($ewim_fieldCount / 2 ? 'gf_right_half' : 'gf_left_half');
+					//endregion
+
+					//region Third Currency
+					$ewim_aFieldDetails= array(
+						'label'             => 'Total '.$ewim_aInventory['inventory_currencies']['tc_third_currency'],
+						'adminLabel'        => 'tc_third_currency',
+						'visibility'        => 'visible',
+						'cssClass'          => $ewim_fieldCSS,
+						'id'                => $ewim_fieldID,
+						'conditionalLogic'  => array(
+							'actionType'    => 'show',
+							'logicType'     => 'any',
+							'rules'         => array(
+								array(
+									'fieldId'   => $ewim_actionFieldID,
+									'operator'  => 'is',
+									'value'     => 'Buy'
+								),
+								array(
+									'fieldId'   => $ewim_actionFieldID,
+									'operator'  => 'is',
+									'value'     => 'Sell'
+								)
+							)
+						),
+						'isRequired'        => 0,
+						'defaultValue'      => 0
+					);
+
+					$ewim_ewim_gform_field_creator= new ewim_gform_field_creator();
+
+					$ewim_oNewNumberField= $ewim_ewim_gform_field_creator->number_field($ewim_aFieldDetails, $ewim_oNumberFieldTemplate);
+
+					$ewim_oForm['fields'][$ewim_fieldCount]= $ewim_oNewNumberField;
+
+					//Increase Counters
+					$ewim_fieldCount++;
+					$ewim_itemCount++;
+					$ewim_fieldID++;
+
+					//Alternate to next CSS Class
+					$ewim_fieldCSS= ($ewim_fieldCount / 2 ? 'gf_right_half' : 'gf_left_half');
+					//endregion
+					break;
 			}
 			//endregion
 
-			//region Item Adjust Form Step 6: Add Fields need for the Game System
-			switch ($ewim_aGame['game_system']){
-				case "DnD":
-					//region DnD Step 2: Modify the craft amount to limit range
-					if($ewim_aItem['item_recipe_ingredients'] != NULL){
-						$ewim_aItemRecipe= json_decode($ewim_aItem['item_recipe_ingredients'],true);
-						$ewim_c= 0;
-						foreach($ewim_aItemRecipe as $ewim_ingredientNameID => $ewim_ingredientAmount){
-							$ewim_aIngredientItemNameID= explode("_",$ewim_ingredientNameID);
-							$ewim_ingredientID= $ewim_aIngredientItemNameID[1];
-							$ewim_aIngredientItem= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_items WHERE id = $ewim_ingredientID",ARRAY_A);
+			//region Eve Step 2: Create and Label Sales Tax Field
+			$ewim_oNewField= clone $ewim_oNumberFieldTemplate;
+			$ewim_oNewField->label= 'Sales Tax';
+			$ewim_oNewField->adminLabel= "sales_tax";
+			$ewim_oNewField->visibility= 'visible';
+			$ewim_oNewField->cssClass= 'gf_left_half';
+			$ewim_oNewField->id= $ewim_fieldID;
+			$ewim_oNewField->defaultValue= 0;
+			$ewim_oNewField->conditionalLogic= array(
+				'actionType'    => 'show',
+				'logicType'     => 'any',
+				'rules'         => array(
+					array(
+						'fieldId'   => $ewim_actionFieldID,
+						'operator'  => 'is',
+						'value'     => 'Sell'
+					)
+				)
+			);
+			$ewim_oNewField->isRequired= 0;
+			$ewim_oNewField->defaultValue= 0;
 
-							$ewim_aMaxCraft[$ewim_c]= $ewim_aIngredientItem['item_inventory_quantity'] / $ewim_ingredientAmount;
-						}
-					}
+			//Place New Field into Form
+			$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewField;
 
-					$ewim_maxCraft= max($ewim_aMaxCraft);
+			//Increase Counters
+			$ewim_fieldCount++;
+			$ewim_itemCount++;
+			$ewim_fieldID++;
+			//endregion
 
-					$ewim_oForm['fields'][$ewim_craftAmountFieldCount]->rangeMin= 0;
-					$ewim_oForm['fields'][$ewim_craftAmountFieldCount]->rangeMax= $ewim_maxCraft;
-					//endregion
+			//region Eve Step 3: Broker Fee Field
+			$ewim_oNewField= clone $ewim_oNumberFieldTemplate;
+			$ewim_oNewField->label= 'Broker Fee';
+			$ewim_oNewField->adminLabel= "broker_fee";
+			$ewim_oNewField->visibility= 'visible';
+			$ewim_oNewField->cssClass= 'gf_right_half';
+			$ewim_oNewField->id= $ewim_fieldID;
+			$ewim_oNewField->defaultValue= 0;
+			$ewim_oNewField->conditionalLogic= array(
+				'actionType'    => 'show',
+				'logicType'     => 'any',
+				'rules'         => array(
+					array(
+						'fieldId'   => $ewim_actionFieldID,
+						'operator'  => 'is',
+						'value'     => 'Post'
+					),
+					array(
+						'fieldId'   => $ewim_actionFieldID,
+						'operator'  => 'is',
+						'value'     => 'Sell'
+					)
+				)
+			);
+			$ewim_oNewField->isRequired= 0;
+			$ewim_oNewField->defaultValue= 0;
 
-					break;
-				case "EVE":
-					//region Eve Step 2: Create and Label Sales Tax Field
+			//Place New Field into Form
+			$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewField;
+
+			//Increase Counters
+			$ewim_fieldCount++;
+			$ewim_itemCount++;
+			$ewim_fieldID++;
+			//endregion
+
+			//region Eve Step 4: Posted Price field
+			$ewim_oNewField= clone $ewim_oNumberFieldTemplate;
+			$ewim_oNewField->label= 'Post Price';
+			$ewim_oNewField->adminLabel= "posted_price";
+			$ewim_oNewField->visibility= 'visible';
+			$ewim_oNewField->cssClass= 'gf_left_half';
+			$ewim_oNewField->id= $ewim_fieldID;
+			$ewim_oNewField->defaultValue= 0;
+			$ewim_oNewField->conditionalLogic= array(
+				'actionType'    => 'show',
+				'logicType'     => 'any',
+				'rules'         => array(
+					array(
+						'fieldId'   => $ewim_actionFieldID,
+						'operator'  => 'is',
+						'value'     => 'Post'
+					)
+				)
+			);
+			$ewim_oNewField->isRequired= 0;
+			$ewim_oNewField->defaultValue= 0;
+
+			//Place New Field into Form
+			$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewField;
+
+			//Increase Counters
+			$ewim_fieldCount++;
+			$ewim_itemCount++;
+			$ewim_fieldID++;
+			//endregion
+
+			//region Eve Step 5: Manufacture Cost
+			$ewim_oNewField= clone $ewim_oNumberFieldTemplate;
+			$ewim_oNewField->label= "Manufacturing Cost";
+			$ewim_oNewField->adminLabel= "manufacturing_cost";
+			$ewim_oNewField->visibility= 'visible';
+			$ewim_oNewField->cssClass= 'gf_right_half';
+			$ewim_oNewField->id= $ewim_fieldID;
+			$ewim_oNewField->conditionalLogic= array(
+				'actionType'    => 'show',
+				'logicType'     => 'any',
+				'rules'         => array(
+					array(
+						'fieldId'   => $ewim_actionFieldID,
+						'operator'  => 'is',
+						'value'     => 'Manufacture'
+					)
+				)
+			);
+			$ewim_oNewField->isRequired= 0;
+			$ewim_oNewField->defaultValue= 0;
+
+			//Place New Field into Form
+			$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewField;
+
+			//Increase Counters
+			$ewim_fieldCount++;
+			$ewim_itemCount++;
+			$ewim_fieldID++;
+			//endregion
+
+			//region Eve Step 6: Copy Cost
+			$ewim_oNewField= clone $ewim_oNumberFieldTemplate;
+			$ewim_oNewField->label= "Copy Cost";
+			$ewim_oNewField->adminLabel= "copy_cost";
+			$ewim_oNewField->visibility= 'visible';
+			$ewim_oNewField->cssClass= 'gf_right_half';
+			$ewim_oNewField->id= $ewim_fieldID;
+			$ewim_oNewField->conditionalLogic= array(
+				'actionType'    => 'show',
+				'logicType'     => 'any',
+				'rules'         => array(
+					array(
+						'fieldId'   => $ewim_actionFieldID,
+						'operator'  => 'is',
+						'value'     => 'Copy'
+					)
+				)
+			);
+			$ewim_oNewField->isRequired= 0;
+			$ewim_oNewField->defaultValue= 0;
+
+			//Place New Field into Form
+			$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewField;
+
+			//Increase Counters
+			$ewim_fieldCount++;
+			$ewim_itemCount++;
+			$ewim_fieldID++;
+			//endregion
+
+			//region Eve Step 7: Processing Section
+
+			//region Processing Section Label
+			$ewim_oNewSection= clone $ewim_oSectionFieldTemplate;
+			$ewim_oNewSection->label= 'Minerals Received from Processing';
+			$ewim_oNewSection->visibility= 'visible';
+			$ewim_oNewSection->id= $ewim_fieldID;
+			$ewim_oNewSection->conditionalLogic= array(
+				'actionType'    => 'show',
+				'logicType'     => 'any',
+				'rules'         => array(
+					array(
+						'fieldId'   => $ewim_actionFieldID,
+						'operator'  => 'is',
+						'value'     => 'Process'
+					)
+				)
+			);
+			$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewSection;//Push our new field object into the form object
+			$ewim_fieldCount++;
+			$ewim_fieldID++;
+			//endregion
+
+			if($ewim_aItem['design_details'] != NULL){
+				$ewim_aDesignDetails= explode(',',$ewim_aItem['design_details']);
+				$ewim_fieldCSS= 'gf_left_half';
+
+				foreach($ewim_aDesignDetails as $ewim_aDesignDetail){
+					$ewim_aDesignDetailItem= explode('_', $ewim_aDesignDetail);
+
+					$ewim_ingredientID= $ewim_aDesignDetailItem[1];
+
+					$ewim_aIngredientItem= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_items WHERE id = $ewim_ingredientID",ARRAY_A);
+
+					//region Create Mineral Fields
 					$ewim_oNewField= clone $ewim_oNumberFieldTemplate;
-					$ewim_oNewField->label= 'Sales Tax';
-					$ewim_oNewField->adminLabel= "sales_tax";
+					$ewim_oNewField->label= $ewim_aIngredientItem['item_name'].' Gained';
+					$ewim_oNewField->adminLabel= "process_".$ewim_aIngredientItem['item_name'].'_'.$ewim_aIngredientItem['id'];
 					$ewim_oNewField->visibility= 'visible';
-					$ewim_oNewField->cssClass= 'gf_left_half';
+					$ewim_oNewField->cssClass= $ewim_fieldCSS;
 					$ewim_oNewField->id= $ewim_fieldID;
 					$ewim_oNewField->defaultValue= 0;
 					$ewim_oNewField->conditionalLogic= array(
-						'actionType'    => 'show',
-						'logicType'     => 'any',
-						'rules'         => array(
-							array(
-								'fieldId'   => $ewim_actionFieldID,
-								'operator'  => 'is',
-								'value'     => 'Sell'
-							)
-						)
-					);
-					$ewim_oNewField->isRequired= 0;
-					$ewim_oNewField->defaultValue= 0;
-
-					//Place New Field into Form
-					$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewField;
-
-					//Increase Counters
-					$ewim_fieldCount++;
-					$ewim_itemCount++;
-					$ewim_fieldID++;
-					//endregion
-
-					//region Eve Step 3: Broker Fee Field
-					$ewim_oNewField= clone $ewim_oNumberFieldTemplate;
-					$ewim_oNewField->label= 'Broker Fee';
-					$ewim_oNewField->adminLabel= "broker_fee";
-					$ewim_oNewField->visibility= 'visible';
-					$ewim_oNewField->cssClass= 'gf_right_half';
-					$ewim_oNewField->id= $ewim_fieldID;
-					$ewim_oNewField->defaultValue= 0;
-					$ewim_oNewField->conditionalLogic= array(
-						'actionType'    => 'show',
-						'logicType'     => 'any',
-						'rules'         => array(
-							array(
-								'fieldId'   => $ewim_actionFieldID,
-								'operator'  => 'is',
-								'value'     => 'Post'
-							),
-							array(
-								'fieldId'   => $ewim_actionFieldID,
-								'operator'  => 'is',
-								'value'     => 'Sell'
-							)
-						)
-					);
-					$ewim_oNewField->isRequired= 0;
-					$ewim_oNewField->defaultValue= 0;
-
-					//Place New Field into Form
-					$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewField;
-
-					//Increase Counters
-					$ewim_fieldCount++;
-					$ewim_itemCount++;
-					$ewim_fieldID++;
-					//endregion
-
-					//region Eve Step 4: Posted Price field
-					$ewim_oNewField= clone $ewim_oNumberFieldTemplate;
-					$ewim_oNewField->label= 'Post Price';
-					$ewim_oNewField->adminLabel= "posted_price";
-					$ewim_oNewField->visibility= 'visible';
-					$ewim_oNewField->cssClass= 'gf_left_half';
-					$ewim_oNewField->id= $ewim_fieldID;
-					$ewim_oNewField->defaultValue= 0;
-					$ewim_oNewField->conditionalLogic= array(
-						'actionType'    => 'show',
-						'logicType'     => 'any',
-						'rules'         => array(
-							array(
-								'fieldId'   => $ewim_actionFieldID,
-								'operator'  => 'is',
-								'value'     => 'Post'
-							)
-						)
-					);
-					$ewim_oNewField->isRequired= 0;
-					$ewim_oNewField->defaultValue= 0;
-
-					//Place New Field into Form
-					$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewField;
-
-					//Increase Counters
-					$ewim_fieldCount++;
-					$ewim_itemCount++;
-					$ewim_fieldID++;
-					//endregion
-
-					//region Eve Step 5: Manufacture Cost
-					$ewim_oNewField= clone $ewim_oNumberFieldTemplate;
-					$ewim_oNewField->label= "Manufacturing Cost";
-					$ewim_oNewField->adminLabel= "manufacturing_cost";
-					$ewim_oNewField->visibility= 'visible';
-					$ewim_oNewField->cssClass= 'gf_right_half';
-					$ewim_oNewField->id= $ewim_fieldID;
-					$ewim_oNewField->conditionalLogic= array(
-						'actionType'    => 'show',
-						'logicType'     => 'any',
-						'rules'         => array(
-							array(
-								'fieldId'   => $ewim_actionFieldID,
-								'operator'  => 'is',
-								'value'     => 'Manufacture'
-							)
-						)
-					);
-					$ewim_oNewField->isRequired= 0;
-					$ewim_oNewField->defaultValue= 0;
-
-					//Place New Field into Form
-					$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewField;
-
-					//Increase Counters
-					$ewim_fieldCount++;
-					$ewim_itemCount++;
-					$ewim_fieldID++;
-					//endregion
-
-					//region Eve Step 6: Copy Cost
-					$ewim_oNewField= clone $ewim_oNumberFieldTemplate;
-					$ewim_oNewField->label= "Copy Cost";
-					$ewim_oNewField->adminLabel= "copy_cost";
-					$ewim_oNewField->visibility= 'visible';
-					$ewim_oNewField->cssClass= 'gf_right_half';
-					$ewim_oNewField->id= $ewim_fieldID;
-					$ewim_oNewField->conditionalLogic= array(
-						'actionType'    => 'show',
-						'logicType'     => 'any',
-						'rules'         => array(
-							array(
-								'fieldId'   => $ewim_actionFieldID,
-								'operator'  => 'is',
-								'value'     => 'Copy'
-							)
-						)
-					);
-					$ewim_oNewField->isRequired= 0;
-					$ewim_oNewField->defaultValue= 0;
-
-					//Place New Field into Form
-					$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewField;
-
-					//Increase Counters
-					$ewim_fieldCount++;
-					$ewim_itemCount++;
-					$ewim_fieldID++;
-					//endregion
-
-					//region Eve Step 7: Processing Section
-
-					//region Processing Section Label
-					$ewim_oNewSection= clone $ewim_oSectionFieldTemplate;
-					$ewim_oNewSection->label= 'Minerals Received from Processing';
-					$ewim_oNewSection->visibility= 'visible';
-					$ewim_oNewSection->id= $ewim_fieldID;
-					$ewim_oNewSection->conditionalLogic= array(
 						'actionType'    => 'show',
 						'logicType'     => 'any',
 						'rules'         => array(
@@ -915,101 +1252,102 @@ function create_input_fields($ewim_oForm){
 							)
 						)
 					);
-					$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewSection;//Push our new field object into the form object
+					$ewim_oNewField->isRequired= 0;
+					$ewim_oNewField->defaultValue= 0;
+
+					//Place New Field into Form
+					$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewField;
+
+					//Increase Counters
 					$ewim_fieldCount++;
+					$ewim_itemCount++;
 					$ewim_fieldID++;
+
+					//Alternate to next CSS Class
+					$ewim_fieldCSS= ($ewim_fieldCount / 2 ? 'gf_right_half' : 'gf_left_half');
 					//endregion
 
-					if($ewim_aItem['design_details'] != NULL){
-						$ewim_aDesignDetails= explode(',',$ewim_aItem['design_details']);
-						$ewim_fieldCSS= 'gf_left_half';
+					//region Create Price Field
+					$ewim_oNewField= clone $ewim_oNumberFieldTemplate;
+					$ewim_oNewField->label= $ewim_aIngredientItem['item_name'].' ISK Cost';
+					$ewim_oNewField->adminLabel= "process_cost_".$ewim_aIngredientItem['item_name'].'_'.$ewim_aIngredientItem['id'];
+					$ewim_oNewField->visibility= 'visible';
+					$ewim_oNewField->cssClass= $ewim_fieldCSS;
+					$ewim_oNewField->id= $ewim_fieldID;
+					$ewim_oNewField->defaultValue= 0;
+					$ewim_oNewField->conditionalLogic= array(
+						'actionType'    => 'show',
+						'logicType'     => 'any',
+						'rules'         => array(
+							array(
+								'fieldId'   => $ewim_actionFieldID,
+								'operator'  => 'is',
+								'value'     => 'Process'
+							)
+						)
+					);
+					$ewim_oNewField->isRequired= 0;
+					$ewim_oNewField->defaultValue= 0;
 
-						foreach($ewim_aDesignDetails as $ewim_aDesignDetail){
-							$ewim_aDesignDetailItem= explode('_', $ewim_aDesignDetail);
+					//Place New Field into Form
+					$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewField;
 
-							$ewim_ingredientID= $ewim_aDesignDetailItem[1];
+					//Increase Counters
+					$ewim_fieldCount++;
+					$ewim_itemCount++;
+					$ewim_fieldID++;
 
-							$ewim_aIngredientItem= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_items WHERE id = $ewim_ingredientID",ARRAY_A);
-
-							//region Create Mineral Fields
-							$ewim_oNewField= clone $ewim_oNumberFieldTemplate;
-							$ewim_oNewField->label= $ewim_aIngredientItem['item_name'].' Gained';
-							$ewim_oNewField->adminLabel= "process_".$ewim_aIngredientItem['item_name'].'_'.$ewim_aIngredientItem['id'];
-							$ewim_oNewField->visibility= 'visible';
-							$ewim_oNewField->cssClass= $ewim_fieldCSS;
-							$ewim_oNewField->id= $ewim_fieldID;
-							$ewim_oNewField->defaultValue= 0;
-							$ewim_oNewField->conditionalLogic= array(
-								'actionType'    => 'show',
-								'logicType'     => 'any',
-								'rules'         => array(
-									array(
-										'fieldId'   => $ewim_actionFieldID,
-										'operator'  => 'is',
-										'value'     => 'Process'
-									)
-								)
-							);
-							$ewim_oNewField->isRequired= 0;
-							$ewim_oNewField->defaultValue= 0;
-
-							//Place New Field into Form
-							$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewField;
-
-							//Increase Counters
-							$ewim_fieldCount++;
-							$ewim_itemCount++;
-							$ewim_fieldID++;
-
-							//Alternate to next CSS Class
-							$ewim_fieldCSS= ($ewim_fieldCount / 2 ? 'gf_right_half' : 'gf_left_half');
-							//endregion
-
-							//region Create Price Field
-							$ewim_oNewField= clone $ewim_oNumberFieldTemplate;
-							$ewim_oNewField->label= $ewim_aIngredientItem['item_name'].' ISK Cost';
-							$ewim_oNewField->adminLabel= "process_cost_".$ewim_aIngredientItem['item_name'].'_'.$ewim_aIngredientItem['id'];
-							$ewim_oNewField->visibility= 'visible';
-							$ewim_oNewField->cssClass= $ewim_fieldCSS;
-							$ewim_oNewField->id= $ewim_fieldID;
-							$ewim_oNewField->defaultValue= 0;
-							$ewim_oNewField->conditionalLogic= array(
-								'actionType'    => 'show',
-								'logicType'     => 'any',
-								'rules'         => array(
-									array(
-										'fieldId'   => $ewim_actionFieldID,
-										'operator'  => 'is',
-										'value'     => 'Process'
-									)
-								)
-							);
-							$ewim_oNewField->isRequired= 0;
-							$ewim_oNewField->defaultValue= 0;
-
-							//Place New Field into Form
-							$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewField;
-
-							//Increase Counters
-							$ewim_fieldCount++;
-							$ewim_itemCount++;
-							$ewim_fieldID++;
-
-							//Alternate to next CSS Class
-							$ewim_fieldCSS= ($ewim_fieldCount / 2 ? 'gf_right_half' : 'gf_left_half');
-							//endregion
-						}
-					}
+					//Alternate to next CSS Class
+					$ewim_fieldCSS= ($ewim_fieldCount / 2 ? 'gf_right_half' : 'gf_left_half');
 					//endregion
+				}
+			}
+			//endregion
 
-					//region Eve Step 8: Manufacturing Section
+			//region Eve Step 8: Manufacturing Section
 
-					//region Manufacturing Mineral Section Label
-					$ewim_oNewSection= clone $ewim_oSectionFieldTemplate;
-					$ewim_oNewSection->label= 'Total Refined Resources Used during Manufacturing';
-					$ewim_oNewSection->visibility= 'visible';
-					$ewim_oNewSection->id= $ewim_fieldID;
-					$ewim_oNewSection->conditionalLogic= array(
+			//region Manufacturing Mineral Section Label
+			$ewim_oNewSection= clone $ewim_oSectionFieldTemplate;
+			$ewim_oNewSection->label= 'Total Refined Resources Used during Manufacturing';
+			$ewim_oNewSection->visibility= 'visible';
+			$ewim_oNewSection->id= $ewim_fieldID;
+			$ewim_oNewSection->conditionalLogic= array(
+				'actionType'    => 'show',
+				'logicType'     => 'any',
+				'rules'         => array(
+					array(
+						'fieldId'   => $ewim_actionFieldID,
+						'operator'  => 'is',
+						'value'     => 'Manufacture'
+					)
+				)
+			);
+			$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewSection;//Push our new field object into the form object
+			$ewim_fieldCount++;
+			$ewim_fieldID++;
+			//endregion
+
+			if($ewim_aItem['design_details'] != NULL){
+				$ewim_aDesignDetails= explode(',',$ewim_aItem['design_details']);
+				$ewim_fieldCSS= 'gf_left_half';
+
+				foreach($ewim_aDesignDetails as $ewim_aDesignDetail){
+					//Set up Design Item Details for DB Query for Full details
+					$ewim_aDesignDetailItem= explode('_', $ewim_aDesignDetail);
+					$ewim_ingredientID= $ewim_aDesignDetailItem[1];
+
+					//Get Design Item full details
+					$ewim_aIngredientItem= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_items WHERE id = $ewim_ingredientID",ARRAY_A);
+
+					//Create New field
+					$ewim_oNewField= clone $ewim_oNumberFieldTemplate;
+					$ewim_oNewField->label= $ewim_aIngredientItem['item_name'];
+					$ewim_oNewField->adminLabel= "manufacture_".$ewim_aIngredientItem['item_name'].'_'.$ewim_aIngredientItem['id'];
+					$ewim_oNewField->visibility= 'visible';
+					$ewim_oNewField->cssClass= $ewim_fieldCSS;
+					$ewim_oNewField->id= $ewim_fieldID;
+					$ewim_oNewField->defaultValue= 0;
+					$ewim_oNewField->conditionalLogic= array(
 						'actionType'    => 'show',
 						'logicType'     => 'any',
 						'rules'         => array(
@@ -1020,64 +1358,22 @@ function create_input_fields($ewim_oForm){
 							)
 						)
 					);
-					$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewSection;//Push our new field object into the form object
+					$ewim_oNewField->isRequired= 0;
+					$ewim_oNewField->defaultValue= 0;
+					$ewim_oNewField->rangeMin= 0;
+					$ewim_oNewField->rangeMax= $ewim_aIngredientItem['item_inventory_quantity'];
+
+					//Place New Field into Form
+					$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewField;
+
+					//Increase Counters
 					$ewim_fieldCount++;
+					$ewim_itemCount++;
 					$ewim_fieldID++;
-					//endregion
 
-					if($ewim_aItem['design_details'] != NULL){
-						$ewim_aDesignDetails= explode(',',$ewim_aItem['design_details']);
-						$ewim_fieldCSS= 'gf_left_half';
-
-						foreach($ewim_aDesignDetails as $ewim_aDesignDetail){
-							//Set up Design Item Details for DB Query for Full details
-							$ewim_aDesignDetailItem= explode('_', $ewim_aDesignDetail);
-							$ewim_ingredientID= $ewim_aDesignDetailItem[1];
-
-							//Get Design Item full details
-							$ewim_aIngredientItem= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_items WHERE id = $ewim_ingredientID",ARRAY_A);
-
-							//Create New field
-							$ewim_oNewField= clone $ewim_oNumberFieldTemplate;
-							$ewim_oNewField->label= $ewim_aIngredientItem['item_name'];
-							$ewim_oNewField->adminLabel= "manufacture_".$ewim_aIngredientItem['item_name'].'_'.$ewim_aIngredientItem['id'];
-							$ewim_oNewField->visibility= 'visible';
-							$ewim_oNewField->cssClass= $ewim_fieldCSS;
-							$ewim_oNewField->id= $ewim_fieldID;
-							$ewim_oNewField->defaultValue= 0;
-							$ewim_oNewField->conditionalLogic= array(
-								'actionType'    => 'show',
-								'logicType'     => 'any',
-								'rules'         => array(
-									array(
-										'fieldId'   => $ewim_actionFieldID,
-										'operator'  => 'is',
-										'value'     => 'Manufacture'
-									)
-								)
-							);
-							$ewim_oNewField->isRequired= 0;
-							$ewim_oNewField->defaultValue= 0;
-							$ewim_oNewField->rangeMin= 0;
-							$ewim_oNewField->rangeMax= $ewim_aIngredientItem['item_inventory_quantity'];
-
-							//Place New Field into Form
-							$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewField;
-
-							//Increase Counters
-							$ewim_fieldCount++;
-							$ewim_itemCount++;
-							$ewim_fieldID++;
-
-							//Alternate to next CSS Class
-							$ewim_fieldCSS= ($ewim_fieldCount / 2 ? 'gf_right_half' : 'gf_left_half');
-						}
-					}
-					//endregion
-
-					break;
-				default:
-					break;
+					//Alternate to next CSS Class
+					$ewim_fieldCSS= ($ewim_fieldCount / 2 ? 'gf_right_half' : 'gf_left_half');
+				}
 			}
 			//endregion
 
@@ -1090,7 +1386,7 @@ function create_input_fields($ewim_oForm){
 			//endregion
 
 			//region Posted Adjust Form Step 1: Get the game system
-			$ewim_aGame= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_games WHERE id = $ewim_activeGameID",ARRAY_A);
+			$ewim_aGame= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_games WHERE id = $ewim_activeInventoryID",ARRAY_A);
 			//endregion
 
 			//region Posted Adjust Form Step 2: Loop Fields. Get any template fields, and find id fields for conditional logic
@@ -1276,7 +1572,7 @@ function ewim_gf_populate_lists($ewim_oForm){
 	$ewim_current_user= wp_get_current_user();
 	$ewim_userID= $ewim_current_user->ID;
 	$ewim_debug_settings= new ewim_debug_settings();
-	//$ewim_activeGameID= get_user_meta($ewim_userID, 'active_game', true);
+	//$ewim_activeInventoryID= get_user_meta($ewim_userID, 'active_game', true);
 	$ewim_activeGameSystem= get_user_meta($ewim_userID, 'active_game_system', true);
 	//endregion
 
@@ -1284,6 +1580,8 @@ function ewim_gf_populate_lists($ewim_oForm){
 
 	foreach ($ewim_oForm['fields'] as &$ewim_aField){
 		$ewim_cssClass= explode(" ", $ewim_aField['cssClass']);
+
+		//region Users Game List
 		if(in_array('game_list', $ewim_cssClass)){
 			$ewim_aGames= $wpdb->get_results("SELECT * FROM $ewim_tables->ewim_games WHERE user_id = $ewim_userID",ARRAY_A);
 			if($ewim_aGames != ''){
@@ -1297,6 +1595,23 @@ function ewim_gf_populate_lists($ewim_oForm){
 				$ewim_aField->choices = $choices;
 			}
 		}
+		//endregion
+
+		//region Currency Style List
+		if(in_array('currency_style_list', $ewim_cssClass)){//todo finish this
+			$ewim_aCurrencyStylesMeta= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_meta_data WHERE meta_key = 'default_currency_styles'",ARRAY_A);
+			$ewim_aCurrencyStyles= explode(",",$ewim_aCurrencyStylesMeta['meta_value']);
+			foreach($ewim_aCurrencyStyles as $ewim_currencyStyle){
+				$choices[]= array(
+					'text'  => $ewim_currencyStyle,
+					'value' => $ewim_currencyStyle
+				);
+			}
+			$ewim_aField->placeholder= 'Select One';
+			$ewim_aField->choices= $choices;
+		}
+		//endregion
+
 		//region Item Category Lists
 		if(in_array('item_category_list', $ewim_cssClass)){
 			switch ($ewim_activeGameSystem){
@@ -1356,280 +1671,3 @@ function ewim_gf_populate_lists($ewim_oForm){
 
 	return $ewim_oForm;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-/**
- * Name: Item Related Form Pre Render
- * Desc: Can be called by any form that pulls data from the item table, as long as item_id has been passed
- */
-/*
-//region Filters
-add_filter( "gform_pre_render_$ewim_acquireFormID", 'item_related_form_pre_render' );
-add_filter( "gform_pre_render_$ewim_removeFormID", 'item_related_form_pre_render' );
-//endregion
-function item_related_form_pre_render($ewim_oForm){
-	add_filter( 'gform_field_value', 'item_related_form_populate_field_values', 10, 3 );
-	return $ewim_oForm;
-}
-*/
-
-
-
-
-/**
- * Name: Item Related Form Populate Field Values
- * Desc: Called by the Item Related Form Pre Render. Will populate the fields that have dynamic enabled with the corresponding field from the database. Must have item id in post or request
- *
- * @param $value
- * @param $field
- * @param $name
- *
- * @return mixed
- */
-function item_related_form_populate_field_values( $value, /** @noinspection PhpUnusedParameterInspection */$field, $name ) {
-	//region Global Variables, Classes, Class Variables, Local Variables
-	global $wpdb;
-
-	$ewim_debug_settings= new ewim_debug_settings();
-	$ewim_tables= new ewim_tables();
-	$ewim_current_user= wp_get_current_user();
-	$ewim_aValues= array();
-	$ewim_itemID= $_REQUEST['record_id'];
-
-	$ewim_userID= $ewim_current_user->ID;
-	//$ewim_debug_settings= new ewim_debug_settings();
-	$ewim_activeGameID= get_user_meta($ewim_userID, 'active_game', true);
-	//endregion
-
-	//region Debug
-	if($ewim_debug_settings->ewim_formPopulateRecordStart == 1 && $field['adminLabel'] == 'design'){
-		echo "<h1>Populate Record Start</h1>";
-		echo "<pre style='color:red;'>";
-		print_r($field);
-		echo "</pre>";
-		exit;
-	}
-	//endregion
-
-	//region Step 1: Get Item Information and Decode where needed
-	$ewim_aItem= $wpdb->get_row( "SELECT * FROM $ewim_tables->ewim_items WHERE id = '$ewim_itemID'", ARRAY_A );//Find customer by location ID
-	//$ewim_aItem['item_recipe_ingredients']= json_decode($ewim_aItem['item_recipe_ingredients'], true);
-	$ewim_aItem['design']= json_decode($ewim_aItem['item_recipe_ingredients'], true);
-
-	$ewim_aItem['item_meta']= json_decode($ewim_aItem['item_meta'], true);
-	$ewim_aGame= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_games WHERE id = $ewim_activeGameID",ARRAY_A);
-	//endregion
-
-	//region Step 2: Loop and assign record data to fields
-	$ewim_aValues['record_id']= $ewim_aItem['id'];
-	foreach($ewim_aItem as $ewim_key => $ewim_value){
-		switch ($ewim_aGame['game_system']){
-			case "DnD":
-				if(is_array($ewim_value)){
-					foreach($ewim_value as $ewim_k => $ewim_v){
-						$ewim_aValues[$ewim_k]= $ewim_v;
-					}
-				}
-				else{
-					$ewim_aValues[$ewim_key]= $ewim_value;
-				}
-				break;
-			case "Eve":
-				if(is_array($ewim_value)){
-					if($ewim_key == 'item_recipe_ingredients'){
-						foreach($ewim_value as $ewim_k => $ewim_v){
-							$ewim_aValues[$ewim_k.'_'.$ewim_v]= 'Yes';
-						}
-					}
-					elseif($ewim_key == 'design'){
-						foreach($ewim_value as $ewim_k => $ewim_v){
-							$ewim_aValues[$ewim_key]= "No Choices";
-							//echo "We are running. $name | $value <br />";
-						}
-					}
-					else{
-						foreach($ewim_value as $ewim_k => $ewim_v){
-							$ewim_aValues[$ewim_k]= $ewim_k;
-						}
-					}
-				}
-				else{
-					$ewim_aValues[$ewim_key]= $ewim_value;
-				}
-				break;
-		}
-
-	}
-	//endregion
-
-	$test= isset( $ewim_aValues[ $name ] ) ? $ewim_aValues[ $name ] : $value;
-	//echo "We are running. $name | $test <br />";
-
-	//region Debug
-	//if($ewim_debug_settings->ewim_formPopulateRecordEnd == 1 && $field['adminLabel'] == 'item_recipe_ingredients'){
-	if($ewim_debug_settings->ewim_formPopulateRecordEnd == 1 && $name == 'design'){
-		echo "<h1>Edit Record | Form End | $name | $ewim_key | $value</h1>";
-		echo "<pre style='color:red;'>";
-		print_r($ewim_aValues[$name]);
-		echo "</pre>";
-		//exit;
-	}
-	//endregion
-
-	return isset( $ewim_aValues[ $name ] ) ? $ewim_aValues[ $name ] : $value;
-
-}
-
-
-
-function populate_category($ewim_value, $ewim_aField, $ewim_fieldName){
-	echo "<h1>Category Called</h1>";
-	return "Product";
-}
-function populate_design( $value, $field, $ewim_fieldName ) {
-	echo "<h1>Design called with $ewim_fieldName <br /></h1>";
-	// Use the POSTed data if it's there
-	//return isset( $_POST[ $name ] ) ? $_POST[ $name ] : $value;
-	return "Refined Resource 1_32,Refined Resource 2_33";
-}
-
-function populate_name( $value, $field, $ewim_fieldName ) {
-	echo "<h1>Name called with $ewim_fieldName <br /></h1>";
-	// Use the POSTed data if it's there
-	//return isset( $_POST[ $name ] ) ? $_POST[ $name ] : $value;
-	return "Product";
-}
-
-
-function item_related_form_populate_field_values_two( $ewim_value, /** @noinspection PhpUnusedParameterInspection */$ewim_aField, $ewim_fieldName ) {
-	//region Global Variables, Classes, Class Variables, Local Variables
-	global $wpdb;
-
-	$ewim_debug_settings= new ewim_debug_settings();
-	$ewim_tables= new ewim_tables();
-	$ewim_current_user= wp_get_current_user();
-	$ewim_aValues= array();
-	$ewim_itemID= $_REQUEST['record_id'];
-
-	$ewim_userID= $ewim_current_user->ID;
-	//$ewim_debug_settings= new ewim_debug_settings();
-	$ewim_activeGameID= get_user_meta($ewim_userID, 'active_game', true);
-	//endregion
-
-	//region Debug
-	if($ewim_debug_settings->ewim_formPopulateRecordStart == 1 && $field['adminLabel'] == 'design'){
-		echo "<h1>Populate Record Start</h1>";
-		echo "<pre style='color:red;'>";
-		print_r($field);
-		echo "</pre>";
-		exit;
-	}
-	//endregion
-
-	//region Step 1: Get Item Information and Decode where needed
-	$ewim_aItem= $wpdb->get_row( "SELECT * FROM $ewim_tables->ewim_items WHERE id = '$ewim_itemID'", ARRAY_A );//Find customer by location ID
-	//$ewim_aItem['item_recipe_ingredients']= json_decode($ewim_aItem['item_recipe_ingredients'], true);
-
-	$ewim_aItem['item_meta']= json_decode($ewim_aItem['item_meta'], true);
-	$ewim_aGame= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_games WHERE id = $ewim_activeGameID",ARRAY_A);
-	//endregion
-
-	//region Step 2: Loop and assign record data to fields
-	$ewim_aCssClass= explode(" ",$ewim_aField['cssClass']);
-
-	switch ($ewim_aField['type']){
-		case "hidden":
-			switch ($ewim_fieldName){
-				case "record_id":
-					$ewim_recordValue= $ewim_aItem['id'];
-					break;
-				case "game_id":
-					$ewim_recordValue= $ewim_aItem[$ewim_fieldName];
-					break;
-				default:
-					break;
-			}
-			break;
-		default:
-			switch ($ewim_fieldName){
-				case "design_details":
-					//todo: Hope to one day figure out what is going on with checkboxes, spent nearly 8 hours trying to figure out.
-					//todo: If I set hidden fields and the dynamic checkbox, works fine.
-					//todo: If I set hidden fields, dynamic checkbox and standard checkbox, works fine
-					//todo: If I set hidden fields, dynamic checkbox, standard checkbox, and visible fields, dynamic checkboxes do not work.
-					//add_filter('gform_field_value_design', 'populate_design', 10, 3);
-					$ewim_recordValue= $ewim_aItem['design_details'];
-					//return "Refined Resource 1_32";
-					break;
-				default:
-					//todo: Keep an eye on, may need array handler
-					if(in_array("template", $ewim_aCssClass)){
-						//Do nothing
-					}else{
-						$ewim_recordValue= $ewim_aItem[$ewim_fieldName];
-					}
-					break;
-			}
-			break;
-	}
-	//endregion
-
-
-
-	//region Debug
-	if($ewim_debug_settings->ewim_formPopulateRecordEnd == 1 && $ewim_fieldName == 'design_details'){
-	//if($ewim_debug_settings->ewim_formPopulateRecordEnd == 1){
-		echo "<h1>Populate Record End | $ewim_itemID | $ewim_fieldName</h1>";
-		echo "<pre style='color:red;'>";
-		print_r($ewim_recordValue);
-		echo "</pre>";
-		//exit;
-	}
-	//endregion
-
-	return isset( $ewim_recordValue ) ? $ewim_recordValue : $ewim_value;
-
-}
-
-/*
- * Name: This is a good way to populate fields, I have a more efficient method currently, but this could come in handy
- * todo, move to a scrap project before launching version 2.0
- * https://resoundingechoes.net/development/gravity-forms-how-to-pre-populate-fields/
-foreach($ewim_oForm['fields'] as $ewim_aFields){
-	$ewim_fieldName= ($ewim_aFields['type'] != 'hidden' ? $ewim_aFields['adminLabel'] : $ewim_aFields['label']);
-
-	//	add_filter("gform_field_value_$ewim_fieldName", "ewim_return_value");
-}
-function ewim_return_value($ewim_value){
-	//region Global Variables, Local Variables, Classes
-	global $wpdb;
-	$ewim_tables= new ewim_tables();
-	$ewim_current_user= wp_get_current_user();
-	$ewim_aValues= array();
-	$ewim_itemID= $_REQUEST['item_id'];
-
-	$ewim_userID= $ewim_current_user->ID;
-	$ewim_debug_settings= new ewim_debug_settings();
-	$ewim_activeGameID= get_user_meta($ewim_userID, 'active_game', true);
-	//endregion
-	$ewim_currentFilter= current_filter();
-	$ewim_field= str_replace('gform_field_value_', '', $ewim_currentFilter);
-	$ewim_aItem= $wpdb->get_row( "SELECT * FROM $ewim_tables->ewim_items WHERE id = '$ewim_itemID'", ARRAY_A );
-	$ewim_aItem['item_recipe_ingredients']= json_decode($ewim_aItem['item_recipe_ingredients'], true);
-	foreach($ewim_aItem['item_recipe_ingredients'] as $ewim_key => $ewim_value){
-		$ewim_aItem[$ewim_key]= $ewim_value;
-	}
-
-	return $ewim_aItem[$ewim_field];
-}
-*/
