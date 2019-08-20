@@ -34,7 +34,7 @@ function create_input_fields($ewim_oForm){
 	$ewim_activeInventoryID= get_user_meta($ewim_userID, 'active_inventory', true);
 	//endregion
 
-	//region Debug: Form Start
+	//region Debug: ewim_CreateFieldsFormStart
 	if($ewim_debug_settings->ewim_CreateFieldsFormStart == 1){
 		echo "<h1>Create Fields Form Start</h1>";
 		echo "<pre style='color:red;'>";
@@ -634,7 +634,7 @@ function create_input_fields($ewim_oForm){
 			//todo percentage for sells
 			//todo posting option, fee field, figure way to calculate fee when item sales, new table field?
 
-			//region Item Adjust Form Step 1: Get the game system, set game system variables
+			//region Currency Handler
 			$ewim_aInventory= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_games WHERE id = $ewim_activeInventoryID",ARRAY_A);
 			$ewim_aInventory['inventory_currencies']= json_decode($ewim_aInventory['inventory_currencies'], true);
 
@@ -795,7 +795,7 @@ function create_input_fields($ewim_oForm){
 			$ewim_fieldID++;
 			//endregion
 
-			//region Item Adjust Form Step 4: Create Item Amount Fields Associated with Action
+			//region Item Amount Fields Associated with Action : Number Field
 			//Create Amount Field for Each possible Action
 			foreach ($ewim_aActions as $ewim_action){
 				$ewim_oNewField= clone $ewim_oNumberFieldTemplate;
@@ -867,7 +867,7 @@ function create_input_fields($ewim_oForm){
 			}
 			//endregion
 
-			//region Item Adjust Form Step 5: Create Coin Fields
+			//region Coin Fields : Number Fields
 			switch ($ewim_aInventory['inventory_currency_system']){
 				case "Single Currency System":
 					$ewim_aFieldDetails= array(

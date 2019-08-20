@@ -258,7 +258,7 @@ function ewim_master_pre_submission($ewim_oForm){
 			$amount_Copy= 0;
 			//endregion
 
-			//region Item Transaction Step 1: Loop the Fields, Assign to Variables
+			//region Loop the Fields, Assign to Variables
 			foreach($ewim_oForm['fields'] as $ewim_aField){
 				switch ($ewim_aField['type']){
 					case "hidden":
@@ -272,6 +272,9 @@ function ewim_master_pre_submission($ewim_oForm){
 							case "record_id":
 								$ewim_recordID= $_POST['input_'.$ewim_aField['id']];
 								//$ewim_recordIDFieldID= $ewim_aField['id'];
+								break;
+							case "form_message":
+								$ewim_formMessageFieldID= $ewim_aField['id'];
 								break;
 							default:
 								$ewim_aInsert[$ewim_aField['label']]= $_POST['input_'.$ewim_aField['id']];
@@ -336,7 +339,9 @@ function ewim_master_pre_submission($ewim_oForm){
 							echo "</pre>";
 							exit;
 						}
-						return "There was an error creating this record. Please return to the item and try again. An email has been sent to the Admin with the error details.";
+						//$ewim_formMessageFieldID
+						$_POST['input_'.$ewim_formMessageFieldID]= "There was an error creating this record. Please return to the item and try again. An email has been sent to the Admin with the error details.";
+						return;
 					}
 					//endregion
 
@@ -369,7 +374,6 @@ function ewim_master_pre_submission($ewim_oForm){
 						}
 					}
 					//endregion
-
 					break;
 				case "Harvest":
 					//Amount being Harvested

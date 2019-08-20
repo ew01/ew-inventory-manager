@@ -132,9 +132,9 @@ $ewim_editItemButton="
 //endregion
 
 //region Display
-$ewim_form= do_shortcode('[gravityform id="16" title="false" description="false"]');//todo update other pages to use this, and modify to handle form id passed in
+$ewim_form= do_shortcode('[gravityform id="'.$ewim_get_options->ewim_itemTransactionFormID.'" title="false" description="false"]');//todo update other pages to use this, and modify to handle form id passed in
 $ewim_content.=<<<EOV
-$ewim_formMessage
+<p>$ewim_formMessage</p>
 <h1>$ewim_itemName</h1>
 <p style="display: inline;">$ewim_editItemButton</p>
 <table class="ewim-zebra-base">
