@@ -46,6 +46,10 @@ foreach($ewim_aLedgerRecords as &$ewim_aLedgerRecord){
 
 			switch($ewim_aLedgerRecord['transaction_type']){
 				case 'Buy':
+					//Calculate total Profit Loss
+					$ewim_totalDifference= $ewim_totalDifference - $ewim_aLedgerRecord['total_cost'];
+
+
 					$ewim_aLedgerRecord['total_cost']= '-'.number_format($ewim_aLedgerRecord['total_cost'],2,'.',',').' '.$ewim_currency;
 					$ewim_aLedgerRecord['average_cost']= '-'.number_format($ewim_aLedgerRecord['average_cost'],2,'.',',').' '.$ewim_currency;
 
@@ -54,8 +58,13 @@ foreach($ewim_aLedgerRecords as &$ewim_aLedgerRecord){
 
 					$ewim_aLedgerRecord['broker_fees']= 'N/A';
 					$ewim_aLedgerRecord['sales_tax']= 'N/A';
+
+
 					break;
 				case 'Sell':
+					//Calculate total Profit Loss
+					$ewim_totalDifference = $ewim_totalDifference + $ewim_aLedgerRecord['total_cost'] - $ewim_aLedgerRecord['total_production_cost'] - $ewim_aLedgerRecord['broker_fees'] -$ewim_aLedgerRecord['sales_tax'];
+
 					$ewim_aLedgerRecord['total_cost']= '+'.number_format($ewim_aLedgerRecord['total_cost'],2,'.',',').' '.$ewim_currency;
 					$ewim_aLedgerRecord['average_cost']= '+'.number_format($ewim_aLedgerRecord['average_cost'],2,'.',',').' '.$ewim_currency;
 
@@ -64,8 +73,13 @@ foreach($ewim_aLedgerRecords as &$ewim_aLedgerRecord){
 
 					$ewim_aLedgerRecord['broker_fees']= number_format($ewim_aLedgerRecord['broker_fees'],2,'.',',').' '.$ewim_currency;
 					$ewim_aLedgerRecord['sales_tax']= number_format($ewim_aLedgerRecord['sales_tax'],2,'.',',').' '.$ewim_currency;
+
+
 					break;
 				case 'Manufacture':
+					//Calculate total Profit Loss
+					$ewim_totalDifference = $ewim_totalDifference - $ewim_aLedgerRecord['total_cost'];
+
 					$ewim_aLedgerRecord['total_cost']= '-'.number_format($ewim_aLedgerRecord['total_cost'],2,'.',',').' '.$ewim_currency;
 					$ewim_aLedgerRecord['average_cost']= '-'.number_format($ewim_aLedgerRecord['average_cost'],2,'.',',').' '.$ewim_currency;
 
@@ -74,8 +88,13 @@ foreach($ewim_aLedgerRecords as &$ewim_aLedgerRecord){
 
 					$ewim_aLedgerRecord['broker_fees']= 'N/A';
 					$ewim_aLedgerRecord['sales_tax']= 'N/A';
+
+
 					break;
 				case 'Process':
+					//Calculate total Profit Loss
+					$ewim_totalDifference = $ewim_totalDifference - $ewim_aLedgerRecord['total_cost'];
+
 					$ewim_aLedgerRecord['total_cost']= '-'.number_format($ewim_aLedgerRecord['total_cost'],2,'.',',').' '.$ewim_currency;
 					$ewim_aLedgerRecord['average_cost']= 'N/A';
 
@@ -84,8 +103,13 @@ foreach($ewim_aLedgerRecords as &$ewim_aLedgerRecord){
 
 					$ewim_aLedgerRecord['broker_fees']= 'N/A';
 					$ewim_aLedgerRecord['sales_tax']= 'N/A';
+
+
 					break;
 				case 'Copy':
+					//Calculate total Profit Loss
+					$ewim_totalDifference = $ewim_totalDifference - $ewim_aLedgerRecord['total_cost'];
+
 					$ewim_aLedgerRecord['total_cost']= '-'.number_format($ewim_aLedgerRecord['total_cost'],2,'.',',').' '.$ewim_currency;
 					$ewim_aLedgerRecord['average_cost']= '-'.number_format($ewim_aLedgerRecord['average_cost'],2,'.',',').' '.$ewim_currency;
 
@@ -94,11 +118,12 @@ foreach($ewim_aLedgerRecords as &$ewim_aLedgerRecord){
 
 					$ewim_aLedgerRecord['broker_fees']= 'N/A';
 					$ewim_aLedgerRecord['sales_tax']= 'N/A';
+
+
 					break;
 			}
 
-			//Calculate total Profit Loss
-			$ewim_totalDifference = $ewim_totalDifference + $ewim_aLedgerRecord['total_cost'];
+
 			break;
 		case 'Triple Currency System':
 			break;
@@ -135,7 +160,7 @@ $ewim_content.= <<<EOV
 	                    <th class="ewim-text-center ewim-w-5p">Type</th>
 	                    <th class="ewim-text-center ewim-w-14p">Item</th>
 	                    <th class="ewim-text-center ewim-w-5p">Quantity</th>
-						<th class="ewim-text-center ewim-w-14p">Debit/Credit</th>
+						<th class="ewim-text-center ewim-w-14p">Transaction Amount</th>
 	                    <th class="ewim-text-center ewim-w-14p ewim-ledgerDetails-tooltip">
 	                    	Production Cost*
 	                    	<span class="ewim-ledgerDetails-tooltip-text">Resources Cost + Manufacturing Cost</span>
@@ -144,7 +169,7 @@ $ewim_content.= <<<EOV
 						<th class="ewim-text-center ewim-w-14p">Sales Tax</th>
 	                    <th class="ewim-text-center ewim-w-14p ewim-ledgerDetails-tooltip">
 	                    	Difference*
-	                    	<span class="ewim-ledgerDetails-tooltip-text" style="margin-top: -3.3%;">Debit/Credit - Production Cost - Broker Fees - Sales Tax</span>
+	                    	<span class="ewim-ledgerDetails-tooltip-text" style="margin-top: -3.3%;">Transaction Amount - Production Cost - Broker Fees - Sales Tax</span>
 	                    </th>
 					</tr>
                 </thead>

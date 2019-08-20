@@ -304,42 +304,29 @@ function ewim_master_pre_submission($ewim_oForm){
 					//region Calculations: Costs, Inventory Amounts
 					switch ($ewim_aInventory['inventory_currency_system']){
 						case 'Single Currency System':
-							$ewim_valueOne= $ewim_aItem['cost'];
+							//Secondary Values Array
 							$ewim_aValues= array(
 								$inventory_currency
 							);
-							$ewim_totalCost= 0;
-							foreach($ewim_aValues as $ewim_value){
-								$ewim_totalCost= $ewim_totalCost + $ewim_value;
-							}
 
-							$ewim_difference= 0 - $ewim_totalCost;
-							$ewim_averageBuyCost= $ewim_totalCost / $amount_Buy;
+							//Transaction Total
+							$ewim_totalTransaction= ewim_do_math('+', 0, $ewim_aValues);
+
+							//New Item Cost
+							$ewim_aInsert['cost']= ewim_do_math('+', $ewim_aItem['cost'], $ewim_aValues);
+
+							//Difference
+							$ewim_difference= ewim_do_math('-', 0, $ewim_aValues);
 							break;
 					}
 
-					$ewim_aInsert['cost']= ewim_do_math('+', $ewim_valueOne, $ewim_aValues);
-
+					//New Item Inventory Quantity
 					$ewim_aInsert['item_inventory_quantity']= $ewim_aItem['item_inventory_quantity'] + $amount_Buy;
 					//endregion
 
 					//region Insert to DB
-
-					//region Debug
-					if($ewim_debug_settings->ewim_wpdbEdit == 1){
-						echo "<h1>Edit Result</h1>";
-						echo "Action: " . $ewim_action . "<br />";
-						echo "Table: ". $ewim_editTableName . "<br />";
-						echo "<pre>";
-						print_r($ewim_aInsert);
-						echo "</pre>";
-						exit;
-					}
-					//endregion
-
 					$ewim_updateResult= ewim_wpdb_edit('update',$ewim_editTableName,$ewim_aInsert,$ewim_recordID);
 					if($ewim_updateResult['error'] == 'Error'){
-						//todo echo friendly error
 						if($ewim_debug_settings->ewim_wpdbError == 1){
 							echo "<h1>Edit Result</h1>";
 							echo "Action: " . $ewim_action . "<br />";
@@ -347,45 +334,39 @@ function ewim_master_pre_submission($ewim_oForm){
 							echo "<pre>";
 							print_r($ewim_updateResult['errorMessage']);
 							echo "</pre>";
-
 							exit;
 						}
+						return "There was an error creating this record. Please return to the item and try again. An email has been sent to the Admin with the error details.";
 					}
-					else{
-						//region Assemble and write to ledger
-						$ewim_aLedgerInsert=array(
-							'user_id'                   => $ewim_userID,
-							'inventory_id'                   => $ewim_aItem['inventory_id'],
-							'item_id'                   => $ewim_aItem['id'],
-							'transaction_type'          => 'Buy',
-							'item_amount'               => $amount_Buy,
-							'average_production_cost'   => 0,
-							'total_production_cost'     => 0,
-							'average_cost'              => $ewim_averageBuyCost,
-							'total_cost'                => $ewim_totalCost,
-							'broker_fees'               => 0,
-							'sales_tax'                 => 0,
-							'difference'                => $ewim_difference
-						);
-						$ewim_insertResult= ewim_wpdb_edit('insert',$ewim_cTables->ewim_ledger,$ewim_aLedgerInsert);
-						if($ewim_insertResult['error'] == 'Error'){
-							//todo echo friendly error
-							if($ewim_debug_settings->ewim_wpdbError == 1){
-								echo "<h1>Edit Result</h1>";
-								echo "Action: Insert<br />";
-								echo "Table: Ledger<br />";
-								echo "<pre>";
-								print_r($ewim_insertResult['errorMessage']);
-								echo "</pre>";
+					//endregion
 
-								echo "<h1>Insert Array</h1>";
-								echo "<pre>";
-								print_r($ewim_aLedgerInsert);
-								echo "</pre>";
-								exit;
-							}
+					//region Assemble and write to ledger
+					$ewim_aLedgerInsert=array(
+						'user_id'                   => $ewim_userID,
+						'inventory_id'              => $ewim_aItem['inventory_id'],
+						'item_id'                   => $ewim_aItem['id'],
+						'transaction_type'          => 'Buy',
+						'item_amount'               => $amount_Buy,
+						'total_cost'                => $ewim_totalTransaction,
+						'difference'                => $ewim_difference
+					);
+					$ewim_aLedgerInsertResult= ewim_wpdb_edit('insert',$ewim_cTables->ewim_ledger,$ewim_aLedgerInsert);
+					if($ewim_aLedgerInsertResult['error'] == 'Error'){
+						//todo echo friendly error
+						if($ewim_debug_settings->ewim_wpdbError == 1){
+							echo "<h1>Edit Result</h1>";
+							echo "Action: Insert<br />";
+							echo "Table: Ledger<br />";
+							echo "<pre>";
+							print_r($ewim_aLedgerInsertResult['errorMessage']);
+							echo "</pre>";
+
+							echo "<h1>Insert Array</h1>";
+							echo "<pre>";
+							print_r($ewim_aLedgerInsert);
+							echo "</pre>";
+							exit;
 						}
-						//endregion
 					}
 					//endregion
 

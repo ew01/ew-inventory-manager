@@ -3,7 +3,7 @@
  * Plugin Name: EW Inventory Manager
  * Plugin URI: 
  * Description: Manage your inventory and average item cost
- * Version: 1.0.6
+ * Version: 1.1.0
  * Author: David Ellenburg II
  * Author URI: http://www.ellenburgweb.com
  * License:
@@ -15,6 +15,7 @@
 //todo: Can we make one function to render the GForm instead of writing that in each form hook? | Partially done
 //todo: Change Pre Render to fill out form as it builds it, will now need to build the name and category fields as well | Partial
 //todo: Apply security to pages, if passed Record ID is not associated with the User ID of the logged in User, deny access | Partial
+//todo: Move math functions to a function, so we can call it and let it handle 0s once instead of coding it multiple times
 
 //todo: Upon review, we need to bring back the equivalent of the BPO, new item type of Design
 
