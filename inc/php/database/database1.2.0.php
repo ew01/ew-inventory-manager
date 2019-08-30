@@ -154,10 +154,10 @@ function ewim_install_database_v_1_2_0($ewim_dbVersion){
 		'meta_value'        => $ewim_jsProductActions,
 		'meta_value_type'   => 'json'
 	);
-	/*$wpdb->insert(
+	$wpdb->insert(
 		$ewim_tables->ewim_meta_data,
 		$ewim_aProductActionsMetaInsert
-	);*/
+	);
 	//endregion
 
 	//region Refined Resource
@@ -185,10 +185,10 @@ function ewim_install_database_v_1_2_0($ewim_dbVersion){
 		'meta_value'        => $ewim_jsRefinedResourceActions,
 		'meta_value_type'   => 'json'
 	);
-	/*$wpdb->insert(
+	$wpdb->insert(
 		$ewim_tables->ewim_meta_data,
 		$ewim_aRefinedResourceActionsMetaInsert
-	);*/
+	);
 	//endregion
 
 	//region Raw Resource
@@ -224,10 +224,10 @@ function ewim_install_database_v_1_2_0($ewim_dbVersion){
 		'meta_value'        => $ewim_jsRawResourceActions,
 		'meta_value_type'   => 'json'
 	);
-	/*$wpdb->insert(
+	$wpdb->insert(
 		$ewim_tables->ewim_meta_data,
 		$ewim_aRawResourceActionsMetaInsert
-	);*/
+	);
 	//endregion
 
 	//region Design Copy
@@ -259,10 +259,10 @@ function ewim_install_database_v_1_2_0($ewim_dbVersion){
 		'meta_value'        => $ewim_jsDesignCopyActions,
 		'meta_value_type'   => 'json'
 	);
-	/*$wpdb->insert(
+	$wpdb->insert(
 		$ewim_tables->ewim_meta_data,
 		$ewim_aDesignCopyActionsMetaInsert
-	);*/
+	);
 	//endregion
 
 	//region Component
@@ -298,10 +298,10 @@ function ewim_install_database_v_1_2_0($ewim_dbVersion){
 		'meta_value'        => $ewim_jsComponentActions,
 		'meta_value_type'   => 'json'
 	);
-	/*$wpdb->insert(
+	$wpdb->insert(
 		$ewim_tables->ewim_meta_data,
 		$ewim_aComponentActionsMetaInsert
-	);*/
+	);
 	//endregion
 
 	//endregion
