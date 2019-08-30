@@ -16,3 +16,4 @@
 include_once ( __DIR__ . "/gformPreRenderHooks.php" );
 include_once ( __DIR__ . "/gformPreSubmissionHooks.php" );
 include_once ( __DIR__ . "/gformAfterSubmissionHooks.php" );
+include_once ( __DIR__ . "/ewim_gform_field_creator.php" );

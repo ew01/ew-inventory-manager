@@ -10,80 +10,160 @@
 
 
 
-/**
- * Widths
- */
-.w-100p{
+
+
+/** Font Sizes */
+.ewim-fs-16{
+    font-size: 16px;
+}
+/** Widths */
+.ewim-w-100p{
     width: 100%;
 }
-.w-75p{
+.ewim-w-75p{
     width: 75%;
 }
-.w-65p{
+.ewim-w-65p{
     width: 65%;
 }
-.w-50p{
+.ewim-w-50p{
     width: 50%;
 }
-.w-35p{
+.ewim-w-35p{
     width: 35%;
 }
-.w-30p{
+.ewim-w-30p{
     width: 30%;
 }
-.w-25p{
+.ewim-w-25p{
     width: 25%;
 }
-.w-15p{
+.ewim-w-15p{
     width: 15%;
 }
-/**
- * Heights
- */
-.h-101p{
+.ewim-w-14p{
+    width: 14%;
+}
+.ewim-w-11p{
+    width: 11%;
+}
+.ewim-w-5p{
+    width: 5%;
+}
+
+/** Heights */
+.ewim-h-101p{
     height: 101%;
 }
-.h-100p{
+.ewim-h-100p{
     height: 100%;
 }
 
-/**
- * Alignments
- */
-.text-right{
+/** Alignments */
+.ewim-text-right{
     text-align: right;
 }
-.text-left{
+.ewim-text-left{
     text-align: left;
 }
-.text-center{
-    text-align: center;
+.ewim-text-center{
+    text-align: center !important;
 }
-.float-left{
+.ewim-float-left{
     float: left;
 }
-.float-right{
+.ewim-float-right{
     float: right;
 }
-.buffer{
+.ewim-buffer{
     height:10px;
 }
 
-/**
- * Padding
- */
+/** Positioning */
+.ewim-absolute{
+    position: absolute;
+}
+/** Padding */
 
-/**
- * Tables
- */
-.no-border th, tr, td{
+/** Tables */
+.ewim-zebra-base tr:nth-child(odd) {
+    background-color: #103752;
+}
+th{
+    color:white !important;
+}
+
+.ewim-no-border th, tr, td{
     border: none !important;
 }
 
+/** Button */
+.ewim-et-button-one{
+    font-size: 14px !important;
+}
+.ewim-et-button-one:after{
+    font-size: 23px !important;
+}
+/** Tool Tip Windows */
+/** Designs */
+.ewim-recipe-tooltip .ewim-recipe-tooltip-text {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+}
+.ewim-recipe-tooltip:hover .ewim-recipe-tooltip-text {
+    visibility: visible;
+}
+
+/** Ledger Details */
+.ewim-ledgerDetails-tooltip .ewim-ledgerDetails-tooltip-text {
+    visibility: hidden;
+    width: 300px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    border-color: #fff;
+    border-width: 2px;
+    border-style: solid;
+    padding: 5px 0;
+
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+    margin-top: -2.3%;
+    margin-left: -11.6%;
+    /*top: 100%;
+    left: -35%;*/
+}
+.ewim-ledgerDetails-tooltip:hover .ewim-ledgerDetails-tooltip-text {
+    visibility: visible;
+}
+.ewim-ledgerDetails-tooltip .ewim-ledgerDetails-tooltip-text::after {
+    content: " ";
+    position: absolute;
+    top: 100%; /* At the bottom of the tooltip */
+    left: 50%;
+    margin-left: -5px;
+    border-width: 7px;
+    border-style: solid;
+    border-color: white transparent transparent;
+}
+
+
+/** Gravity Form Classes */
 body .gform_wrapper .gform_footer input[type=submit] {
     color: black;
 }
-
 .gform_body input[type="text"], .gform_body textarea, .gform_body input[type="button"] {
     color: black;
 }
@@ -97,31 +177,5 @@ body .gform_wrapper .gform_footer input[type=submit] {
     color: black;
 }
 
-tr:nth-child(even) {
-    background-color: darkgray;
-    font-weight: bold;
-}
-th{
-    color:white !important;
-}
 
 
-
-
-.recipe-tooltip .recipe-tooltip-text {
-    visibility: hidden;
-    width: 120px;
-    background-color: black;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px 0;
-
-    /* Position the tooltip */
-    position: absolute;
-    z-index: 1;
-}
-
-.recipe-tooltip:hover .recipe-tooltip-text {
-    visibility: visible;
-}

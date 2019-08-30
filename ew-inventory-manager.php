@@ -3,14 +3,23 @@
  * Plugin Name: EW Inventory Manager
  * Plugin URI: 
  * Description: Manage your inventory and average item cost
- * Version: 1.0.3
+ * Version: 1.1.0
  * Author: David Ellenburg II
  * Author URI: http://www.ellenburgweb.com
- * License: 
+ * License:
+ * Form Versions: 2
  */
 
 
 
+//todo: Can we make one function to render the GForm instead of writing that in each form hook? | Partially done
+//todo: Apply security to pages, if passed Record ID is not associated with the User ID of the logged in User, deny access | Partial
+//todo: Move math functions to a function, so we can call it and let it handle 0s once instead of coding it multiple times | Partial
+//todo: Upon review, we need to bring back the equivalent of the BPO, new item type of Design
+//todo: add ability to make a transaction that may not involve users items
+//todo: Restrict debug pages from showing debug if user is not a admin
+//todo: We can call gforms from code, do this everywhere so we can check to be sure item being edited belongs to the user
+//todo: Once gform called from code is done, convert all buttons and links to divi button.
 
 //region Includes
 include_once ( __DIR__ . "/inc/inc.php" );
@@ -60,11 +69,16 @@ function ewim_form_settings() {
 function ewim_page_settings() {
 	require_once ( __DIR__ . "/inc/admin/pageSettings.php" );//Include Global Variables
 }
+//Page Settings
+function ewim_debug_settings() {
+	require_once ( __DIR__ . "/inc/admin/debugSettings.php" );//Include Global Variables
+}
 //Create menu pages
 function ewim_admin_actions() {
 	add_menu_page( 'EW Inventory Manager', 'Inventory Manager', 'manage_options', 'ewim', 'ewim_information');
 	add_submenu_page( 'ewim', 'Form Settings', 'Form Settings', 'manage_options', 'ewimFS', 'ewim_form_settings');
 	add_submenu_page( 'ewim', 'Page Settings', 'Page Settings', 'manage_options', 'ewimPS', 'ewim_page_settings');
+	add_submenu_page( 'ewim', 'Debug Settings', 'Debug Settings', 'manage_options', 'ewimDS', 'ewim_debug_settings');
 }
 //Create the Menus
 add_action('admin_menu', 'ewim_admin_actions');
@@ -109,13 +123,48 @@ function ewim_page($ewim_parameters){
 	}
 	//endregion
 }
+
 //Shortcode [ewim module='' page=''] or [ewim page='']
 add_shortcode( 'ewim', 'ewim_page');
 //endregion
 
+//region Version Shortcode
+function ewim_version(){
+	return "v1.0.6";
+}
+//Shortcode [ewim module='' page=''] or [ewim page='']
+add_shortcode( 'ewim_version', 'ewim_version');
+//endregion
+
 //region Redirect Based on User Role
 function login_redirect( /** @noinspection PhpUnusedParameterInspection */	$redirect_to, $request, $user ) {
-	return home_url();
+	//region Classes, Class Variables, Local Variables
+	$ewim_get_options= new ewim_get_options();
+	$ewim_current_user= wp_get_current_user();
+
+	$ewim_userID= $ewim_current_user->ID;
+	$ewim_activeGameID= get_user_meta($ewim_userID, 'active_game', true);
+	//endregion
+
+	$ewim_inventoriesPageURL= get_permalink(get_page_by_title($ewim_get_options->ewim_inventoriesPage));
+
+	return $ewim_inventoriesPageURL;
+	/*
+	//is there a user to check?
+	global $user;
+	if ( isset( $user->roles ) && is_array( $user->roles ) ) {
+		//check for admins
+		if ( in_array( 'administrator', $user->roles ) ) {
+			// redirect them to the default place
+			return $redirect_to;
+		} else {
+			return home_url()."/shop";
+		}
+	}
+	else {
+		return $redirect_to;
+	}
+	*/
 }
 //Add Redirect Filter
 add_filter( 'login_redirect', 'login_redirect', 10, 3 );

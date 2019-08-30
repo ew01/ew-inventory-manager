@@ -18,13 +18,19 @@ if($_POST['ewim_submit'] == 'Y'){
 	//Form data sent
 	$ewim_displayMessage= "block";
 
+	//Inventories Page
+	$ewim_inventoriesPage= $_POST['ewim_inventoriesPage'];
+	update_option('ewim_inventoriesPage', $ewim_inventoriesPage);
+
+	//Items Pages
+	$ewim_itemsPage= $_POST['ewim_itemsPage'];
+	update_option('ewim_itemsPage', $ewim_itemsPage);
+
 	//Item Detail Pages
 	$ewim_itemPage= $_POST['ewim_itemPage'];
 	update_option('ewim_itemPage', $ewim_itemPage);
 
-	//Detail Pages
-	$ewim_itemListPage= $_POST['ewim_itemListPage'];
-	update_option('ewim_itemListPage', $ewim_itemListPage);
+
 
 	//Post Details
 	$ewim_postPage= $_POST['ewim_postPage'];
@@ -61,6 +67,26 @@ else{
             <h4><?=__("Input Page Names")?></h4>
             <table class="table-form">
                 <tbody>
+                <!--Inventories Page-->
+                <tr>
+                    <th scope="row" align="left">
+                        <label for="ewim_inventoriesPage" style="width:200px;"><?= __("Inventories Page: ")?></label>
+                    </th>
+                    <td>
+                        <input id="ewim_inventoriesPage" name="ewim_inventoriesPage" type="text" value="<?= $ewim_inventoriesPage;?>" /><?= __("Example: Inventories")?>
+                    </td>
+                </tr>
+
+                <!--Item List Page-->
+                <tr>
+                    <th scope="row" align="left">
+                        <label for="ewim_itemsPage" style="width:200px;"><?= __("Item List Page: ")?></label>
+                    </th>
+                    <td>
+                        <input id="ewim_itemsPage" name="ewim_itemsPage" type="text" value="<?= $ewim_itemsPage;?>" /><?= __("Example: Items")?>
+                    </td>
+                </tr>
+
                 <!--Item Page-->
                 <tr>
                     <th scope="row" align="left">
@@ -81,15 +107,7 @@ else{
                     </td>
                 </tr>
 
-                <!--Item List Page-->
-                <tr>
-                    <th scope="row" align="left">
-                        <label for="ewim_itemListPage" style="width:200px;"><?= __("Item List: ")?></label>
-                    </th>
-                    <td>
-                        <input id="ewim_itemListPage" name="ewim_itemListPage" type="text" value="<?= $ewim_itemListPage;?>" /><?= __("Example: Item List")?>
-                    </td>
-                </tr>
+
 
                 </tbody>
             </table>

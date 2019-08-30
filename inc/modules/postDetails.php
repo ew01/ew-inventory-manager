@@ -64,7 +64,7 @@ $ewim_content=<<<EOV
 $ewim_formMessage
 <h1>$ewim_itemName</h1>
 <p style="display: inline;">$ewim_editItemButton</p>
-<table class="no-border">
+<table class="ewim-no-border">
 	<thead>
 		<th>
 			Amount Posted

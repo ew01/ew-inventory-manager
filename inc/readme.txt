@@ -14,13 +14,8 @@ $ewim_oObjectVariable= object;
 -Table Name, camelcase, regardless of the table name. Attach ewim_ at the front to ensure uniqueness
 $ewim_tTableName= "table_name";
 
+-Json Encoded Variable: $ewim_jsJsonVariable
+
 Forms
-
--Location Form
-This form should be able to accept the customer name and ID. ID should be hidden.
-Upon submission, the id should be verified in a pre hook
-
-
-
 Note on GF
 To populate checkbox with url, do this: parameter= this must match the value of the check box exactly, including caps and lower case.

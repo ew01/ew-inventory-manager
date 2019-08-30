@@ -65,7 +65,7 @@ $ewim_content.= <<<EOV
     <div id='itemList' ng-app='listApp' ng-controller='listController' class='default-padding'>
         <h1>$ewim_activeGameName Items <a href='$ewim_itemFormPageURL?game_id=$ewim_activeGameID'><i class='fa fa-plus-circle' aria-hidden='true'></i></a></h1>     
         <h4>{{data.length}} Items</h4>
-            <table id='table-no-border table-elements-no-border' class='table-no-border table-zebra font-bold'>
+            <table id='table-ewim-no-border table-elements-ewim-no-border' class='table-ewim-no-border table-zebra font-bold'>
             	<thead>
             		<!--Name-->
                     <th>
@@ -77,7 +77,7 @@ $ewim_content.= <<<EOV
                     		</span>
                     	</a>
                     	<br />
-                    	<input type='text' class='w-35p' placeholder='Filter' ng-model='byName'>
+                    	<input type='text' class='ewim-w-35p' placeholder='Filter' ng-model='byName'>
                     </th>
                     <!--Average Production Cost-->
                     <th>
@@ -119,7 +119,7 @@ $ewim_content.= <<<EOV
                     		</span>
                     	</a>
                     	<br />
-                    	<input type='text' class='w-35p' placeholder='Filter' ng-model='byStatus'>
+                    	<input type='text' class='ewim-w-35p' placeholder='Filter' ng-model='byStatus'>
                     </th>
                     <!--Posted At-->
                     <th>
