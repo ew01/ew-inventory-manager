@@ -45,6 +45,7 @@ else{
 //Check for active Inventory
 if($ewim_activeInventoryID == ''){
 	$ewim_content.= "<p>Please activate an inventory from the Inventories page</p>";
+	return;
 }
 else{
 	//region Get Inventory Record and Items Record, decode
@@ -59,11 +60,12 @@ else{
 				//Currency Label
 				$ewim_currency= $ewim_aInventoryCurrencies['inventory_currency'];
 
-				//Total Cost
-				$ewim_aItem['cost'] = number_format( $ewim_aItem['cost'], 2, '.', ',' ).' '.$ewim_currency;
 				//Average Item Cost
-				$ewim_aItem['average_cost'] = ( $ewim_aItem['item_inventory_quantity'] > 0 ? number_format( $ewim_aItem['cost'] / $ewim_aItem['item_inventory_quantity'], 2, '.', ',' ) : 0.00 ).' '.$ewim_currency;
+				$ewim_aItem['average_cost']= ewim_do_math('/',$ewim_aItem['cost'],$ewim_aItem['item_inventory_quantity']);
+				$ewim_aItem['average_cost']= number_format( $ewim_aItem['average_cost'], 2, '.', ',' ).' '.$ewim_currency;
 
+				//Total Cost
+				$ewim_aItem['cost']= number_format( $ewim_aItem['cost'], 2, '.', ',' ).' '.$ewim_currency;
 				break;
 			case 'Triple Currency System':
 				break;
@@ -78,11 +80,12 @@ else{
 			$ewim_aItem['recipe'] = 'Yes, hover to see';
 			$ewim_aItem['recipe_items'];
 
-			$ewim_aItem['design_details'] = explode(",", $ewim_aItem['design_details']);
+			$ewim_aItem['design_details'] = json_decode($ewim_aItem['design_details'], true);
 
-			foreach ( $ewim_aItem['design_details'] as $ewim_value ) {
-				$ewim_aValue= explode('_',$ewim_value);
-				$ewim_aItem['recipe_items'].= $ewim_aValue[0].", ";
+			foreach ( $ewim_aItem['design_details'] as $ewim_designItemID => $ewim_aDesignItem ) {
+				$ewim_aDesignItemDetails = $wpdb->get_row( "SELECT * FROM $ewim_tables->ewim_items WHERE id = $ewim_designItemID", ARRAY_A );//Get Items
+
+				$ewim_aItem['recipe_items'].= $ewim_aDesignItemDetails['item_name'].", ";
 			}
 			$ewim_aItem['recipe_items'] = substr( $ewim_aItem['recipe_items'],0 ,-2 );
 

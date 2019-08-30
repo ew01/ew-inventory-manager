@@ -62,7 +62,6 @@ function ewim_install_database_v_1_1_0($ewim_dbVersion){
 			'meta_value_type'   => 'json'
 		)
 	);
-
 	//endregion
 
 	//region Add Field to Games Table
@@ -103,7 +102,6 @@ function ewim_install_database_v_1_1_0($ewim_dbVersion){
 
 	update_option( 'ewim_db_version', $ewim_dbVersion );
 }
-
 
 //region Calls install if db version has changed.
 function ewim_update_db_check_v_1_1_0() {

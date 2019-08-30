@@ -27,15 +27,16 @@ if($_POST['ewim_submit'] == 'Y'){
 	$ewim_itemFormID= $_POST['ewim_itemFormID'];
 	update_option('ewim_itemFormID', $ewim_itemFormID);
 
+	/*
+	$ewim_designFormID= $_POST['ewim_designFormID'];
+	update_option('ewim_designFormID', $ewim_designFormID);
+	*/
+
 	$ewim_itemTransactionFormID= $_POST['ewim_itemTransactionFormID'];
 	update_option('ewim_itemTransactionFormID', $ewim_itemTransactionFormID);
 
 	$ewim_postedTransactionFormID= $_POST['ewim_postedTransactionFormID'];
 	update_option('ewim_postedTransactionFormID', $ewim_postedTransactionFormID);
-
-	$ewim_recipeFormID= $_POST['ewim_recipeFormID'];
-	update_option('ewim_recipeFormID', $ewim_recipeFormID);
-
 
     //endregion
 
@@ -45,6 +46,11 @@ if($_POST['ewim_submit'] == 'Y'){
 
 	$ewim_itemFormPage= $_POST['ewim_itemFormPage'];
 	update_option('ewim_itemFormPage', $ewim_itemFormPage);
+
+	/*
+	$ewim_designFormPage= $_POST['ewim_designFormPage'];
+	update_option('ewim_designFormPage', $ewim_designFormPage);
+	*/
 
 	$ewim_sellPostedFormPage= $_POST['ewim_sellPostedFormPage'];
 	update_option('ewim_sellPostedFormPage', $ewim_sellPostedFormPage);
@@ -65,11 +71,14 @@ else{
 
 	$ewim_inventoryFormPage=                 get_option('ewim_inventoryFormPage');
 
+	/*$ewim_designFormID=                 get_option('ewim_designFormID');*/
+
 	//endregion
 
     //region Form Pages
-	$ewim_inventoryFormPage=                 get_option('ewim_inventoryFormPage');
-	$ewim_itemFormPage=                 get_option('ewim_itemFormPage');
+	$ewim_inventoryFormPage=    get_option('ewim_inventoryFormPage');
+	$ewim_itemFormPage=         get_option('ewim_itemFormPage');
+	/*$ewim_designFormPage=       get_option('ewim_designFormPage');*/
 	//endregion
 
 }
@@ -100,7 +109,6 @@ else{
                         <input id="ewim_inventoryFormID" name="ewim_inventoryFormID" type="text" value="<?= $ewim_inventoryFormID;?>" /><?= __("Example: 1")?>
                     </td>
                 </tr>
-
                 <!--Item Form-->
                 <tr>
                     <th style="width:50%;text-align:left;">
@@ -110,7 +118,15 @@ else{
                         <input id="ewim_itemFormID" name="ewim_itemFormID" type="text" value="<?= $ewim_itemFormID;?>" /><?= __("Example: 5")?>
                     </td>
                 </tr>
-
+                <!--Design Details Form-->
+                <!--<tr>
+                    <th style="width:50%;text-align:left;">
+                        <label for="ewim_designFormID" style="width:200px;"><?= __("Design Form ID: ")?></label>
+                    </th>
+                    <td>
+                        <input id="ewim_designFormID" name="ewim_designFormID" type="text" value="<?= $ewim_designFormID;?>" /><?= __("Example: 5")?>
+                    </td>
+                </tr>-->
                 <!--Item Transaction Form-->
                 <tr>
                     <th style="width:50%;text-align:left;">
@@ -120,7 +136,6 @@ else{
                         <input id="ewim_itemTransactionFormID" name="ewim_itemTransactionFormID" type="text" value="<?= $ewim_itemTransactionFormID;?>" /><?= __("Example: 6")?>
                     </td>
                 </tr>
-
                 <!--Posted Transaction Form-->
                 <tr>
                     <th style="width:50%;text-align:left;">
@@ -130,7 +145,6 @@ else{
                         <input id="ewim_postedTransactionFormID" name="ewim_postedTransactionFormID" type="text" value="<?= $ewim_postedTransactionFormID;?>" /><?= __("Example: 9")?>
                     </td>
                 </tr>
-
                 </tbody>
             </table>
         </div>
@@ -147,7 +161,6 @@ else{
                         <input id="ewim_inventoryFormPage" name="ewim_inventoryFormPage" type="text" value="<?= $ewim_inventoryFormPage;?>" /><?= __("Example: Inventory Form")?>
                     </td>
                 </tr>
-
 				<!--Item Form-->
 				<tr>
 					<th style="width:50%;text-align:left;">
@@ -157,7 +170,15 @@ else{
 						<input id="ewim_itemFormPage" name="ewim_itemFormPage" type="text" value="<?= $ewim_itemFormPage;?>" /><?= __("Example: Item Form")?>
 					</td>
 				</tr>
-
+                <!--Design Details Form-->
+                <!--<tr>
+                    <th style="width:50%;text-align:left;">
+                        <label for="ewim_designFormPage" style="width:200px;"><?= __("Design Form Page: ")?></label>
+                    </th>
+                    <td>
+                        <input id="ewim_designFormPage" name="ewim_designFormPage" type="text" value="<?= $ewim_designFormPage;?>" /><?= __("Example: Design Form")?>
+                    </td>
+                </tr>-->
                 <!--Sell Form-->
                 <tr>
                     <th style="width:50%;text-align:left;">
@@ -167,11 +188,8 @@ else{
                         <input id="ewim_sellPostedFormPage" name="ewim_sellPostedFormPage" type="text" value="<?= $ewim_sellPostedFormPage;?>" /><?= __("Example: Sell Posted")?>
                     </td>
                 </tr>
-
 				</tbody>
 			</table>
-
-
 		</div>
 
 		<br clear="all"/>
