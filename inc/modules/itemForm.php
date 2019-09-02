@@ -41,7 +41,7 @@ else{
 }
 //endregion
 
-$ewim_form= do_shortcode('[gravityform id="'.$ewim_get_options->ewim_itemFormID.'" title="true" description="true"]');
+$ewim_form= do_shortcode('[gravityform id="'.$ewim_get_options->ewim_itemFormID.'" title="true" description="false"]');
 
 $ewim_content.=<<<EOV
 $ewim_form
