@@ -98,6 +98,10 @@ function create_input_fields($ewim_oForm){
 					$ewim_aItem['design_details']= json_decode($ewim_aItem['design_details'], true);
 					$ewim_productID= $ewim_aItem['id'];
 					break;
+				case 'Component':
+					$ewim_aItem['design_details']= json_decode($ewim_aItem['design_details'], true);
+					$ewim_productID= $ewim_aItem['id'];
+					break;
 				case 'Design Copy':
 					$ewim_productID= $ewim_aItem['item_meta']['product_id'];
 					$ewim_aProduct= $wpdb->get_row( "SELECT * FROM $ewim_tables->ewim_items WHERE id = '$ewim_productID'", ARRAY_A );
@@ -603,6 +607,47 @@ function create_input_fields($ewim_oForm){
 							'fieldId'   => $ewim_categoryFieldID,
 							'operator'  => 'is',
 							'value'     => 'Product'
+						)
+					)
+				);
+				//$ewim_oNewField->isRequired= 1;
+				$ewim_oNewNumberField->defaultValue= $ewim_aItem['design_details'][$ewim_aRefinedResource['id']]['amount'];
+
+
+				$ewim_oForm['fields'][$ewim_fieldCount]= $ewim_oNewNumberField;//Push our new field object into the form object
+				$ewim_rsC++;
+				//Increase our counters, alternate our strings
+				$ewim_fieldCount++;
+				$ewim_itemCount++;
+				$ewim_fieldID++;
+				$ewim_fieldCSS= ($ewim_fieldCount / 2 ? 'gf_right_half' : 'gf_left_half');
+			}
+			//endregion
+
+			//region Refined Resource Counts
+			$ewim_rsC= 0;
+			foreach($ewim_aRefinedResources as $ewim_aRefinedResource){
+				$ewim_oNewNumberField= clone $ewim_oNumberFieldTemplate;//Clone the Field Object
+				$ewim_oNewNumberField->label=               $ewim_aRefinedResource['item_name'].' Count';//Label that displays
+				$ewim_oNewNumberField->adminLabel=          $ewim_aRefinedResource['item_name'].'_'.$ewim_aRefinedResource['id'];//Backend label to access field
+				$ewim_oNewNumberField->allowsPrepopulate=   1;//Makes it usable by pre populate functions
+				$ewim_oNewNumberField->inputName=           $ewim_aRefinedResource['item_name'].'_'.$ewim_aRefinedResource['id'];//Label used for pre populate
+				$ewim_oNewNumberField->visibility=          'visible';//Make it Visible
+				$ewim_oNewNumberField->cssClass=            'design_details '.$ewim_fieldCSS;//Add in the alternating CSS
+				$ewim_oNewNumberField->id=                  $ewim_fieldID;//Give it an id
+				$ewim_oNewNumberField->conditionalLogic=    array(
+					'actionType'    => 'show',
+					'logicType'     => 'all',
+					'rules'         => array(
+						array(
+							'fieldId'   => $ewim_refinedResourceCBFieldID,
+							'operator'  => 'is',
+							'value'     => $ewim_aRefinedResource['id']
+						),
+						array(
+							'fieldId'   => $ewim_categoryFieldID,
+							'operator'  => 'is',
+							'value'     => 'Component'
 						)
 					)
 				);
@@ -1244,7 +1289,7 @@ function create_input_fields($ewim_oForm){
 
 			if($ewim_aItem['design_details'] != NULL){
 				$ewim_fieldCSS= 'gf_left_half';
-				foreach($ewim_aItem['design_details'] as $ewim_designItemID => $ewim_aDesignDetails){
+				foreach($ewim_aItem['design_details'] as $ewim_designItemID){
 					$ewim_aIngredientItem= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_items WHERE id = $ewim_designItemID",ARRAY_A);
 
 					//region Create Mineral Fields

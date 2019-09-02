@@ -76,16 +76,25 @@ else{
 		//endregion
 
 		//region Design Details
-		if($ewim_aItem['design_details'] != ''){
+		if($ewim_aItem['design_details'] != '') {
 			$ewim_aItem['recipe'] = 'Yes, hover to see';
 			$ewim_aItem['recipe_items'];
 
-			$ewim_aItem['design_details'] = json_decode($ewim_aItem['design_details'], true);
+			$ewim_aItem['design_details'] = json_decode( $ewim_aItem['design_details'], true );
 
-			foreach ( $ewim_aItem['design_details'] as $ewim_designItemID => $ewim_aDesignItem ) {
-				$ewim_aDesignItemDetails = $wpdb->get_row( "SELECT * FROM $ewim_tables->ewim_items WHERE id = $ewim_designItemID", ARRAY_A );//Get Items
+			if ($ewim_aItem['category'] != 'Raw Resource'){
+				foreach ( $ewim_aItem['design_details'] as $ewim_designItemID => $ewim_aDesignItem ) {
+					$ewim_aDesignItemDetails = $wpdb->get_row( "SELECT * FROM $ewim_tables->ewim_items WHERE id = $ewim_designItemID", ARRAY_A );//Get Items
 
-				$ewim_aItem['recipe_items'].= $ewim_aDesignItemDetails['item_name'].", ";
+					$ewim_aItem['recipe_items'] .= $ewim_aDesignItemDetails['item_name'] . ", ";
+				}
+			}
+			else{
+				foreach ( $ewim_aItem['design_details'] as $ewim_designItemID) {
+					$ewim_aDesignItemDetails = $wpdb->get_row( "SELECT * FROM $ewim_tables->ewim_items WHERE id = $ewim_designItemID", ARRAY_A );//Get Items
+
+					$ewim_aItem['recipe_items'] .= $ewim_aDesignItemDetails['item_name'] . ", ";
+				}
 			}
 			$ewim_aItem['recipe_items'] = substr( $ewim_aItem['recipe_items'],0 ,-2 );
 

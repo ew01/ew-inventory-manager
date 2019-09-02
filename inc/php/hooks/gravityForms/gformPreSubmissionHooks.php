@@ -530,7 +530,7 @@ function ewim_master_pre_submission($ewim_oForm){
 					//endregion
 
 					//region Loop Refined Resources, insert amount gained and new cost
-					foreach($ewim_aDesignDetails as $ewim_designItemID => $ewim_aDesignItemDetails){
+					foreach($ewim_aDesignDetails as $ewim_designItemID){
 						//reset insert array
 						$ewim_aInsertRefinedResource= NULL;
 
@@ -670,6 +670,9 @@ function ewim_master_pre_submission($ewim_oForm){
 						case 'Product':
 							$ewim_productID= $ewim_aItem['id'];//Product ID
 							break;
+						case 'Component':
+							$ewim_productID= $ewim_aItem['id'];//Product ID
+							break;
 						case 'Design Copy':
 							switch ($ewim_aInventory['inventory_currency_system']){
 								case 'Single Currency System':
@@ -753,6 +756,18 @@ function ewim_master_pre_submission($ewim_oForm){
 
 					$ewim_aInsert['cost']= $ewim_aProduct['cost'] + $ewim_manufacturingCostTotal;
 					$ewim_aInsert['item_inventory_quantity']= $ewim_aProduct['item_inventory_quantity'] + $amount_manufacture;
+
+					//region Debug
+					if($ewim_debug_settings->ewim_wpdbEdit == 1){
+						echo "<h1>Edit Result</h1>";
+						echo "Action: " . $ewim_action . "<br />";
+						echo "Table: ". $ewim_editTableName . "<br />";
+						echo "<pre>";
+						print_r($ewim_aInsert);
+						echo "</pre>";
+						exit;
+					}
+					//endregion
 
 					//Insert to DB
 					$ewim_updateResult= ewim_wpdb_edit('update',$ewim_editTableName,$ewim_aInsert,$ewim_productID);
