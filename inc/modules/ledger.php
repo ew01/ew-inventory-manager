@@ -103,6 +103,7 @@ foreach($ewim_aLedgerRecords as &$ewim_aLedgerRecord){
 					}
 					else {
 						$ewim_aLedgerRecord['average_difference']= number_format(ewim_do_math('/', $ewim_aLedgerRecord['transaction_credit_debit'], $ewim_aLedgerRecord['transaction_item_amount']),2,'.',',');
+						$ewim_aLedgerRecord['average_difference']= ewim_do_math('/', $ewim_aLedgerRecord['transaction_credit_debit'], $ewim_aLedgerRecord['transaction_item_amount']);
 					}
 
 					$ewim_undoLink= "<a href='?action=undo&record_id={{record.id}}'>Undo</a>";
