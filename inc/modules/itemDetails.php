@@ -155,7 +155,7 @@ switch ($ewim_itemCategory){
 
 		//region Product Info and Links
 		$ewim_productID= $ewim_aItem['item_meta']['product_id'];
-		$ewim_productName= $ewim_aItem['item_meta']['product_name'];
+		$ewim_productName= $ewim_aProduct['item_name'];
 		$ewim_columnSixTitle= "<th>Product</th>";
 		$ewim_columnSixValue= "<td><a href='?record_id=$ewim_productID'>$ewim_productName</a></td>";
 		//endregion
@@ -197,13 +197,15 @@ switch ($ewim_itemCategory){
 //region Create Border less buttons for safe Posting
 //Edit Button
 $ewim_itemFormPageURL= get_permalink(get_page_by_title($ewim_get_options->ewim_itemFormPage));
-$ewim_editItemButton="
+if($ewim_itemCategory != 'Design Copy'){
+	$ewim_editItemButton="
 <form action='$ewim_itemFormPageURL' style='display: inline'>
 	<input type='hidden' name='record_id' value='$ewim_itemID'>
 	<input type='hidden' name='inventoryID' value='$ewim_activeInventoryID'>
 	<button style='border:0;padding:0;display:inline;background:none;color:#55cbff;'>Edit</button>
 </form>
 ";
+}
 //endregion
 
 //region Display

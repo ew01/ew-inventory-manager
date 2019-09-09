@@ -398,11 +398,13 @@ function create_input_fields($ewim_oForm){
 
 			$ewim_choicesCount= 0;
 			foreach($ewim_aCategories as $ewim_aCategory){
-				$ewim_oNewDDF->choices[$ewim_choicesCount]= array(
-					'text'  => $ewim_aCategory,
-					'value'  => $ewim_aCategory
-				);
-				$ewim_choicesCount++;
+				if($ewim_aCategory != 'Design Copy'){
+					$ewim_oNewDDF->choices[$ewim_choicesCount]= array(
+						'text'  => $ewim_aCategory,
+						'value'  => $ewim_aCategory
+					);
+					$ewim_choicesCount++;
+				}
 			}
 
 			$ewim_oNewDDF->defaultValue= (isset($ewim_aItem['category']) ? $ewim_aItem['category'] : '');
