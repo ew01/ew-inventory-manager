@@ -28,6 +28,8 @@ function create_input_fields($ewim_oForm){
 	$ewim_tables= new ewim_tables();
 	$ewim_debug_settings= new ewim_debug_settings();
 	$ewim_getOptions= new ewim_get_options();
+	$ewim_gform_field_creator= new ewim_gform_field_creator();
+
 	$ewim_current_user= wp_get_current_user();
 
 	$ewim_userID= $ewim_current_user->ID;
@@ -963,9 +965,7 @@ function create_input_fields($ewim_oForm){
 						'defaultValue'      => 0
 					);
 
-					$ewim_ewim_gform_field_creator= new ewim_gform_field_creator();
-
-					$ewim_oNewNumberField= $ewim_ewim_gform_field_creator->number_field($ewim_aFieldDetails, $ewim_oNumberFieldTemplate);
+					$ewim_oNewNumberField= $ewim_gform_field_creator->number_field($ewim_aFieldDetails, $ewim_oNumberFieldTemplate);
 
 					$ewim_oForm['fields'][$ewim_fieldCount]= $ewim_oNewNumberField;
 
@@ -1006,9 +1006,7 @@ function create_input_fields($ewim_oForm){
 						'defaultValue'      => 0
 					);
 
-					$ewim_ewim_gform_field_creator= new ewim_gform_field_creator();
-
-					$ewim_oNewNumberField= $ewim_ewim_gform_field_creator->number_field($ewim_aFieldDetails, $ewim_oNumberFieldTemplate);
+					$ewim_oNewNumberField= $ewim_gform_field_creator->number_field($ewim_aFieldDetails, $ewim_oNumberFieldTemplate);
 
 					$ewim_oForm['fields'][$ewim_fieldCount]= $ewim_oNewNumberField;
 
@@ -1048,9 +1046,7 @@ function create_input_fields($ewim_oForm){
 						'defaultValue'      => 0
 					);
 
-					$ewim_ewim_gform_field_creator= new ewim_gform_field_creator();
-
-					$ewim_oNewNumberField= $ewim_ewim_gform_field_creator->number_field($ewim_aFieldDetails, $ewim_oNumberFieldTemplate);
+					$ewim_oNewNumberField= $ewim_gform_field_creator->number_field($ewim_aFieldDetails, $ewim_oNumberFieldTemplate);
 
 					$ewim_oForm['fields'][$ewim_fieldCount]= $ewim_oNewNumberField;
 
@@ -1090,9 +1086,7 @@ function create_input_fields($ewim_oForm){
 						'defaultValue'      => 0
 					);
 
-					$ewim_ewim_gform_field_creator= new ewim_gform_field_creator();
-
-					$ewim_oNewNumberField= $ewim_ewim_gform_field_creator->number_field($ewim_aFieldDetails, $ewim_oNumberFieldTemplate);
+					$ewim_oNewNumberField= $ewim_gform_field_creator->number_field($ewim_aFieldDetails, $ewim_oNumberFieldTemplate);
 
 					$ewim_oForm['fields'][$ewim_fieldCount]= $ewim_oNewNumberField;
 
@@ -1366,7 +1360,7 @@ function create_input_fields($ewim_oForm){
 			//endregion
 
 			//region Manufacturing Section
-
+//todo override field for resource amounts
 			//region Manufacturing Refined Resources Section Label
 			$ewim_oNewSection= clone $ewim_oSectionFieldTemplate;
 			$ewim_oNewSection->label= 'Total Refined Resources &amp; Components Used during Manufacturing';
@@ -1389,13 +1383,86 @@ function create_input_fields($ewim_oForm){
 			$ewim_fieldID++;
 			//endregion
 
+			//region Use Override Values : Drop Down
+			$ewim_aFieldDetails= array(
+				'label'             => 'Use Override Values',
+				'adminLabel'        => 'use_override_values',
+				'visibility'        => 'visible',
+				'cssClass'          => 'gf_left_half',
+				'id'                => $ewim_fieldID,
+				'conditionalLogic'  => array(
+					'actionType'    => 'show',
+					'logicType'     => 'any',
+					'rules'         => array(
+						array(
+							'fieldId'   => $ewim_actionFieldID,
+							'operator'  => 'is',
+							'value'     => 'manufacture'
+						)
+					)
+				),
+				'choices'           => array(
+					array(
+						'text'  => 'No',
+						'value' => 'no'
+					),
+					array(
+						'text'  => 'Yes',
+						'value' => 'yes'
+					)
+				),
+				'isRequired'        => 0,
+				'defaultValue'      => 'no'
+			);
+			$ewim_newDropDownField= $ewim_gform_field_creator->default_field($ewim_aFieldDetails,$ewim_oDropDownFieldTemplate);
+			//$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_newDropDownField;//Push our new field object into the form object
+
+			$ewim_fieldCount++;
+			$ewim_fieldID++;
+			//endregion
+
+
+
 			if($ewim_aItem['design_details'] != NULL){
 				$ewim_fieldCSS= 'gf_left_half';
-
+				$ewim_fieldCSS2= 'gf_first_quarter';
+				$ewim_fieldCSS3= 'gf_second_quarter';
 				foreach($ewim_aItem['design_details'] as $ewim_designItemID => $ewim_aDesignItemDetails){
 					//Get Design Item full details
 					$ewim_aIngredientItem= $wpdb->get_row("SELECT * FROM $ewim_tables->ewim_items WHERE id = $ewim_designItemID",ARRAY_A);
 
+					//region Field with Calculation
+					$ewim_aFieldDetails= array(
+						'label'                 => $ewim_aIngredientItem['item_name'],
+						'adminLabel'            => "manufacture_".$ewim_aIngredientItem['item_name'].'_'.$ewim_aIngredientItem['id'],
+						'visibility'            => 'visible',
+						'cssClass'              => $ewim_fieldCSS2,
+						'id'                    => $ewim_fieldID,
+						'conditionalLogic'      => array(
+							'actionType'    => 'show',
+							'logicType'     => 'any',
+							'rules'         => array(
+								array(
+									'fieldId'   => $ewim_actionFieldID,
+									'operator'  => 'is',
+									'value'     => 'Manufacture'
+								)
+							)
+						),
+						'isRequired'            => 0,
+						'enableCalculation'     => 1,
+						'calculationFormula'    => $ewim_aDesignItemDetails['amount']." * {amount_manufacture:$ewim_manufactureAmountFieldID}"
+					);
+					/*
+					if($ewim_aItem['category'] == 'Product' || $ewim_aItem['category'] == 'Component' || $ewim_aItem['category'] == 'Design Copy'){
+						$ewim_aFieldDetails['enableCalculation']= 1;
+						//$ewim_aDesign
+						$ewim_aFieldDetails['calculationFormula']= $ewim_aDesignItemDetails['amount']." * {amount_manufacture:$ewim_manufactureAmountFieldID}";
+					}
+					*/
+					$ewim_oNewNumberField= $ewim_gform_field_creator->default_field($ewim_aFieldDetails,$ewim_oNumberFieldTemplate);
+
+					/*
 					//Create New field
 					$ewim_oNewField= clone $ewim_oNumberFieldTemplate;
 					$ewim_oNewField->label=         $ewim_aIngredientItem['item_name'];
@@ -1408,7 +1475,6 @@ function create_input_fields($ewim_oForm){
 					$ewim_oNewField->defaultValue=  0;
 					$ewim_oNewField->rangeMin=      0;
 					$ewim_oNewField->rangeMax=      $ewim_aIngredientItem['item_inventory_quantity'];
-
 					$ewim_oNewField->conditionalLogic= array(
 						'actionType'    => 'show',
 						'logicType'     => 'any',
@@ -1420,24 +1486,58 @@ function create_input_fields($ewim_oForm){
 							)
 						)
 					);
-
 					if($ewim_aItem['category'] == 'Product' || $ewim_aItem['category'] == 'Component' || $ewim_aItem['category'] == 'Design Copy'){
 						$ewim_oNewField->enableCalculation= 1;
 						//$ewim_aDesign
 						$ewim_oNewField->calculationFormula= $ewim_aDesignItemDetails['amount']." * {amount_manufacture:$ewim_manufactureAmountFieldID}";
 					}
+					*/
 
 
 					//Place New Field into Form
-					$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewField;
+					$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewNumberField;
 
 					//Increase Counters
 					$ewim_fieldCount++;
 					$ewim_itemCount++;
 					$ewim_fieldID++;
+					//endregion
+
+					//region Override field
+					$ewim_aFieldDetails= array(
+						'label'             => $ewim_aIngredientItem['item_name'].' Override',
+						'adminLabel'        => "manufacture_override_".$ewim_aIngredientItem['item_name'].'_'.$ewim_aIngredientItem['id'],
+						'visibility'        => 'visible',
+						'cssClass'          => $ewim_fieldCSS3,
+						'id'                => $ewim_fieldID,
+						'conditionalLogic'  => array(
+							'actionType'    => 'show',
+							'logicType'     => 'any',
+							'rules'         => array(
+								array(
+									'fieldId'   => $ewim_actionFieldID,
+									'operator'  => 'is',
+									'value'     => 'Manufacture'
+								)
+							)
+						),
+						'isRequired'        => 0,
+						'rangeMax'          => $ewim_aIngredientItem['item_inventory_quantity']
+					);
+					$ewim_oNewNumberField= $ewim_gform_field_creator->default_field($ewim_aFieldDetails,$ewim_oNumberFieldTemplate);
+
+					//Place New Field into Form
+					$ewim_oForm['fields'][$ewim_fieldCount]=$ewim_oNewNumberField;
+
+					//Increase Counters
+					$ewim_fieldCount++;
+					$ewim_itemCount++;
+					$ewim_fieldID++;
+					//endregion
 
 					//Alternate to next CSS Class
-					$ewim_fieldCSS= ($ewim_fieldCount / 2 ? 'gf_right_half' : 'gf_left_half');
+					$ewim_fieldCSS2= ($ewim_fieldCSS2 == 'gf_first_quarter' ? 'gf_third_quarter' : 'gf_first_quarter');
+					$ewim_fieldCSS3= ($ewim_fieldCSS2 == 'gf_second_quarter' ? 'gf_fourth_quarter' : 'gf_second_quarter');
 				}
 			}
 			//endregion

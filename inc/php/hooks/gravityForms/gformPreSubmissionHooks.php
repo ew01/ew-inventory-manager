@@ -688,6 +688,7 @@ function ewim_master_pre_submission($ewim_oForm){
 
 					//region Get Product Record
 					$ewim_aProduct= $wpdb->get_row("SELECT * FROM $ewim_cTables->ewim_items WHERE id = $ewim_productID", ARRAY_A);//Product, needed to calculate new prices and quantities
+					$ewim_aDesignDetails= json_decode($ewim_aProduct['design_details'], true);
 					//endregion
 
 					//region Ingredients
@@ -700,7 +701,13 @@ function ewim_master_pre_submission($ewim_oForm){
 						//endregion
 
 						//region Dynamic Variable for Field Admin Label
-						$ewim_designItemAmountFAL= "manufacture_".$ewim_aDesignItem['item_name'].'_'.$ewim_designItemID;
+						$ewim_designItemAmountOverrideFAL= "manufacture_override_".$ewim_aDesignItem['item_name'].'_'.$ewim_designItemID;
+						if($$ewim_designItemAmountOverrideFAL != ''){
+							$ewim_designItemAmountFAL= "manufacture_override_".$ewim_aDesignItem['item_name'].'_'.$ewim_designItemID;
+						}
+						else{
+							$ewim_designItemAmountFAL= "manufacture_".$ewim_aDesignItem['item_name'].'_'.$ewim_designItemID;
+						}
 						//endregion
 
 						//region Calculations: Costs, Inventory Amounts

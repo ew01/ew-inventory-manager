@@ -17,6 +17,26 @@
  */
 class ewim_gform_field_creator {
 
+	public function default_field($ewim_aFieldDetails,$ewim_oNumberFieldTemplate){
+		$ewim_oNewField= clone $ewim_oNumberFieldTemplate;
+		foreach($ewim_aFieldDetails as $ewim_key => $ewim_value){
+			$ewim_oNewField->$ewim_key= $ewim_value;
+		}
+
+		/*
+		$ewim_oNewField->label= $ewim_aFieldDetails['label'];
+		$ewim_oNewField->adminLabel= $ewim_aFieldDetails['adminLabel'];
+		$ewim_oNewField->visibility= $ewim_aFieldDetails['visibility'];
+		$ewim_oNewField->cssClass= $ewim_aFieldDetails['cssClass'];
+		$ewim_oNewField->id= $ewim_aFieldDetails['id'];
+		$ewim_oNewField->conditionalLogic= $ewim_aFieldDetails['conditionalLogic'];
+		$ewim_oNewField->isRequired= $ewim_aFieldDetails['isRequired'];
+		$ewim_oNewField->defaultValue= $ewim_aFieldDetails['defaultValue'];
+		*/
+
+		return $ewim_oNewField;
+	}
+
 	public function number_field($ewim_aFieldDetails, $ewim_oNumberFieldTemplate){
 		$ewim_oNewField= clone $ewim_oNumberFieldTemplate;
 		$ewim_oNewField->label= $ewim_aFieldDetails['label'];
